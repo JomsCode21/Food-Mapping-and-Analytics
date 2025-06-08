@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Libmanan Food - BPLO Admin</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .indicator {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-top: 30px solid #34d399; /* Green */
+        border-left: 30px solid transparent;
+        z-index: 10;
+        display: none;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md">
+      <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="#" class="text-xl font-semibold text-primary">
+          TasteLibmanan - BPLO Admin
+        </a>
+        <div>
+          <button 
+  class="text-sm bg-red-500 text-white px-4 py-2 rounded-md"
+  onclick="window.location.href='landing.html';"
+>
+  Logout
+</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Sidebar -->
+        <div class="md:col-span-1 bg-white rounded-md shadow-md p-4">
+          <h2 class="text-lg font-semibold mb-2">Dashboard Menu</h2>
+          <ul>
+            <li class="mb-2">
+              <a href="#" class="hover:bg-gray-200 hover:text-primary flex items-center" onclick="updateMenuItem(this)">
+                <i class="ri-dashboard-line mr-2"></i>
+                <span id="dashboard-text">Dashboard</span> </a>
+            </li>
+            <li class="mb-2">
+              <a href="#" class="hover:bg-gray-200 hover:text-primary flex items-center" onclick="updateMenuItem(this)">
+                <i class="ri-file-text-line mr-2"></i>
+                <span id="registration-text">Registration Requests</span> </a>
+            </li>
+            <li class="mb-2">
+              <a href="#" class="hover:bg-gray-200 hover:text-primary flex items-center" onclick="updateMenuItem(this)">
+                <i class="ri-store-2-line mr-2"></i>
+                <span id="business-text">Business Management</span> </a>
+            </li>
+            <li>
+              <a href="#" class="hover:bg-gray-200 hover:text-primary flex items-center" onclick="updateMenuItem(this)">
+                <i class="ri-notification-line mr-2"></i>
+                <span id="notification-text">Notifications</span> </a>
+            </li>
+          </ul>
+        </div>
+
+    <script>
+      let activeMenuItem = null;
+
+      function updateMenuItem(item) {
+        // Remove bold from previously active item
+        if (activeMenuItem) {
+          activeMenuItem.querySelector('span').classList.remove('font-bold');
+        }
+
+        // Add bold to the clicked item
+        item.querySelector('span').classList.add('font-bold');
+
+        activeMenuItem = item;
+      }
+    </script>
+
+        <!-- Main Content Area -->
+        <div class="md:col-span-3">
+          <!-- KPIs -->
+          <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div id="card-pending" class="status-card bg-white rounded-md shadow-md p-4 transition-transform hover:scale-105 cursor-pointer relative" onclick="showIndicator('pending')">
+              <div id="indicator-pending" class="indicator absolute top-0 right-0 w-4 h-4 bg-green-400 rounded-bl-md hidden"></div>
+              <h3 class="text-md font-semibold mb-2">Pending Registrations</h3>
+              <p class="text-3xl font-bold text-primary">2</p>
+            </div>
+          
+            <div id="card-approved" class="status-card bg-white rounded-md shadow-md p-4 transition-transform hover:scale-105 cursor-pointer relative" onclick="showIndicator('approved')">
+              <div id="indicator-approved" class="indicator absolute top-0 right-0 w-4 h-4 bg-green-400 rounded-bl-md hidden"></div>
+              <h3 class="text-md font-semibold mb-2">Approved Applications</h3>
+              <p class="text-3xl font-bold text-green-500">157</p>
+            </div>
+          
+            <div id="card-rejected" class="status-card bg-white rounded-md shadow-md p-4 transition-transform hover:scale-105 cursor-pointer relative" onclick="showIndicator('rejected')">
+              <div id="indicator-rejected" class="indicator absolute top-0 right-0 w-4 h-4 bg-green-400 rounded-bl-md hidden"></div>
+              <h3 class="text-md font-semibold mb-2">Rejected Applications</h3>
+              <p class="text-3xl font-bold text-red-500">2</p>
+            </div>
+          </section>
+                    
+
+          <!-- Registration Requests Table -->
+          <section class="bg-white rounded-md shadow-md p-4 mb-6" id="registrationTable" style="display: none;">
+            <h2 class="text-lg font-semibold mb-4" id="tableTitle">Registration Requests</h2>
+          
+            <div class="overflow-x-auto">
+              <table class="min-w-full leading-normal">
+                <thead>
+                  <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Business Name
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Owner Name
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Date Submitted
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+                  <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Aling Nena's</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Nena Corpuz</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Restaurant</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">2025-04-29</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <button class="bg-blue-500 text-white px-3 py-1 rounded-md hover:scale-105 transform transition-all">View</button>
+                      <button class="bg-green-500 text-white px-3 py-1 rounded-md hover:scale-105 transform transition-all">Approve</button>
+                      <button class="bg-red-500 text-white px-3 py-1 rounded-md hover:scale-105 transform transition-all">Reject</button>
+                    </td>
+                    
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          
+            <!-- View All Button -->
+            <div class="flex justify-center mt-4">
+              <button class="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-transform transform hover:scale-105">
+                View All
+              </button>
+            </div>
+            
+          </section>
+          
+
+          <!-- Data Analytics -->
+          <section class="bg-white rounded-md shadow-md p-4">
+            <h2 class="text-lg font-semibold mb-4">Business Trends Analytics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Bar Chart -->
+              <div class="bg-white rounded-md p-4 shadow-sm">
+                <canvas id="barChart" class="w-full h-50"></canvas>
+              </div>
+
+              <!-- Pie Chart -->
+              <div class="bg-white rounded-md p-4 shadow-sm">
+                <canvas id="pieChart" class="w-full h-48"></canvas>
+              </div>
+            </div>
+            
+          </section>
+<br>
+                    <!-- Food Business Owner Information Table -->
+                    <section class="bg-white rounded-md shadow-md p-4 mb-6">
+                      <h2 class="text-lg font-semibold mb-4">Food Business Owner Information</h2>
+                      <div class="overflow-x-auto">
+                        <table class="min-w-full leading-normal">
+                          <thead>
+                            <tr>
+                              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Business ID
+                              </th>
+                              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Business Name
+                              </th>
+                              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Owner Name
+                              </th>
+                              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Address
+                              </th>
+                              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Contact Number
+                              </th>
+                              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Business Category
+                              </th>
+                              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Registration Date
+                              </th>
+                              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <!-- Example food business owner data row -->
+                            <tr>
+                              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">1</p>
+                              </td>
+                              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">Aling Nena's Restaurant</p>
+                              </td>
+                              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">Nena Corpuz</p>
+                              </td>
+                              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">123 Main St, Libmanan</p>
+                              </td>
+                              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">09123456789</p>
+                              </td>
+                              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">Restaurant</p>
+                              </td>
+                              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">2025-04-29</p>
+                              </td>
+                              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <div class="flex flex-row space-x-2">
+                                  <button class="bg-blue-500 text-white px-3 py-1 rounded-md hover:scale-105 transform transition-all">View</button>
+                                  <button class="bg-red-500 text-white px-3 py-1 rounded-md hover:scale-105 transform transition-all">Delete</button>
+                                </div>
+                              </td>
+                            </tr>
+                            <!-- Add more rows here as needed -->
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+
+          <!-- User table -->
+          
+          <section class="bg-white rounded-md shadow-md p-4 mb-6">  
+            <h2 class="text-lg font-semibold mb-4">User Account Information</h2>
+            <div class="overflow-x-auto">
+              <table class="min-w-full leading-normal">
+                <thead>
+                  <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      User ID
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Account Status
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <!-- Example user data row -->
+                  <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">1</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">John Doe</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">johndoe@example.com</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Active</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <button class="bg-blue-500 text-white px-3 py-1 rounded-md">View</button>
+                      <button class="bg-green-500 text-white px-3 py-1 rounded-md">Edit</button>
+                      <button class="bg-red-500 text-white px-3 py-1 rounded-md">Deactivate</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">2</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">John Doe</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">johndoe@example.com</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Active</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <button class="bg-blue-500 text-white px-3 py-1 rounded-md">View</button>
+                      <button class="bg-green-500 text-white px-3 py-1 rounded-md">Edit</button>
+                      <button class="bg-red-500 text-white px-3 py-1 rounded-md">Deactivate</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">3</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">John Doe</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">johndoe@example.com</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Active</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <button class="bg-blue-500 text-white px-3 py-1 rounded-md">View</button>
+                      <button class="bg-green-500 text-white px-3 py-1 rounded-md">Edit</button>
+                      <button class="bg-red-500 text-white px-3 py-1 rounded-md">Deactivate</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">4</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">John Doe</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">johndoe@example.com</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Active</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <button class="bg-blue-500 text-white px-3 py-1 rounded-md">View</button>
+                      <button class="bg-green-500 text-white px-3 py-1 rounded-md">Edit</button>
+                      <button class="bg-red-500 text-white px-3 py-1 rounded-md">Deactivate</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">5</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">John Doe</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">johndoe@example.com</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Active</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <button class="bg-blue-500 text-white px-3 py-1 rounded-md">View</button>
+                      <button class="bg-green-500 text-white px-3 py-1 rounded-md">Edit</button>
+                      <button class="bg-red-500 text-white px-3 py-1 rounded-md">Deactivate</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">6</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">John Doe</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">johndoe@example.com</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p class="text-gray-900 whitespace-no-wrap">Active</p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <button class="bg-blue-500 text-white px-3 py-1 rounded-md">View</button>
+                      <button class="bg-green-500 text-white px-3 py-1 rounded-md">Edit</button>
+                      <button class="bg-red-500 text-white px-3 py-1 rounded-md">Deactivate</button>
+                    </td>
+                  </tr>
+
+                  <!-- More rows for other users can go here -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+  
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 mt-8">
+      <div class="container mx-auto text-center">
+        <p>&copy; 2025 TasteLibmanan - BPLO Admin</p>
+      </div>
+    </footer>
+
+    <script>
+      // Function to show the selected table and indicator
+  function showIndicator(type) { 
+  const table = document.getElementById("registrationTable");
+  const tableBody = document.getElementById("tableBody");
+  const tableTitle = table.querySelector("h2");
+
+  // Update section title based on type
+  const titles = {
+    pending: "Pending Registration Requests",
+    approved: "Approved Applications",
+    rejected: "Rejected Applications",
+  };
+  tableTitle.textContent = titles[type] || "Registration Requests";
+
+  // Show table
+  table.style.display = "block";
+
+  // Hide all indicators
+  document.querySelectorAll(".indicator").forEach((el) => {
+    el.style.display = "none";
+  });
+
+  // Remove highlight from all cards
+  document.querySelectorAll(".status-card").forEach((card) => {
+    card.classList.remove("ring", "ring-green-500");
+  });
+
+  // Highlight selected card and show its indicator
+  const selected = document.getElementById(`card-${type}`);
+  const indicator = document.getElementById(`indicator-${type}`);
+  if (selected) {
+    indicator.style.display = "block"; // Show indicator
+    selected.classList.add("ring", "ring-green-500");
+  }
+
+  // Sample data for different types
+  let data = [];
+  if (type === "pending") {
+    data = [
+      { businessName: "Aling Nena's", ownerName: "Nena Corpuz", category: "Restaurant", date: "2025-04-29" },
+      { businessName: "Lechon Juan", ownerName: "Juan Dela Cruz", category: "Catering", date: "2025-04-25" },
+    ];
+  } else if (type === "approved") {
+    data = [
+      { businessName: "Rose Eatery", ownerName: "Rose Corpuz", category: "Restaurant", date: "2025-04-20" },
+      { businessName: "Cusinero Chef", ownerName: "Maria Cruz", category: "Restaurant", date: "2025-04-22" },
+    ];
+  } else if (type === "rejected") {
+    data = [
+      { businessName: "Failed Business", ownerName: "John Doe", category: "Restaurant", date: "2025-04-15" },
+      { businessName: "Bankrupt Food", ownerName: "Jane Smith", category: "Restaurant", date: "2025-04-16" },
+    ];
+  }
+
+  // Update the table body with dynamic data
+  tableBody.innerHTML = data
+  .map(
+    (item) => `
+      <tr>
+        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${item.businessName}</td>
+        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${item.ownerName}</td>
+        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${item.category}</td>
+        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${item.date}</td>
+        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+          <button class="bg-blue-500 text-white px-3 py-1 rounded-md">View</button>
+          ${type !== "approved" ? `<button class="bg-green-500 text-white px-3 py-1 rounded-md">Approve</button>` : ""}
+          <button class="bg-red-500 text-white px-3 py-1 rounded-md">${type === "rejected" ? "Delete" : "Reject"}</button>
+        </td>
+      </tr>`
+  )
+  .join("");
+
+}
+
+
+    // Bar chart initialization
+const barChart = new Chart(document.getElementById("barChart"), {
+  type: "bar",
+  data: {
+    labels: [
+      "Aling Nena's",
+      "Lechon Juan",
+      "Cafe Sa Puno",
+      "Tita's Kitchen",
+      "Juan's Lechon",
+      "Luna Cafe",
+      "Panda Express",
+      "Sarap Bites",
+      "Bistro Miki",
+      "Hapag Kubo",
+    ],
+    datasets: [
+      {
+        label: "Number of Visits",
+        data: [150, 200, 175, 120, 250, 180, 210, 160, 140, 190], // Visits for each food business
+        backgroundColor: "#34d399",
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 45, // Rotate labels for better visibility
+          minRotation: 0,
+        },
+      },
+      y: {
+        beginAtZero: true,
+      },
+    },
+  },
+});
+
+
+      // Pie chart initialization
+      const pieChart = new Chart(document.getElementById("pieChart"), {
+        type: "pie",
+        data: {
+          labels: ["Restaurant", "MilkteaShop", "Fastfood", "Bakery"],
+          datasets: [
+            {
+              data: [40, 30, 20, 10],
+              backgroundColor: ["#34d399", "#4caf50", "#f44336" , "#FF0000"],
+            },
+          ],
+        },
+      });
+    </script>
+  </body>
+</html>
