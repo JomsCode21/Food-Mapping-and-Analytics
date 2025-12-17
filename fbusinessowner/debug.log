@@ -1,0 +1,76 @@
+Array
+(
+    [menus] => Array
+        (
+            [0] => Array
+                (
+                    [name] => Adobo
+                    [category] => Meals
+                    [price] => 55
+                )
+
+        )
+
+)
+
+Array
+(
+    [menus] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Array
+                        (
+                            [image] => IMG_20251004_160043_362.jpg
+                        )
+
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Array
+                        (
+                            [image] => IMG_20251004_160043_362.jpg
+                        )
+
+                )
+
+            [type] => Array
+                (
+                    [0] => Array
+                        (
+                            [image] => 
+                        )
+
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => Array
+                        (
+                            [image] => 
+                        )
+
+                )
+
+            [error] => Array
+                (
+                    [0] => Array
+                        (
+                            [image] => 3
+                        )
+
+                )
+
+            [size] => Array
+                (
+                    [0] => Array
+                        (
+                            [image] => 0
+                        )
+
+                )
+
+        )
+
+)

@@ -1,11 +1,12 @@
 <?php
-header('Content-Type: application/json');
-session_start(); // Start the session
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Include database connection
+header('Content-Type: application/json');
+session_start();
+
 require_once 'db_con.php';
 
-// Get data from the request
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data) {
@@ -13,38 +14,66 @@ if (!$data) {
     exit;
 }
 
-// Validate data
 if (empty($data['email']) || empty($data['password'])) {
-    echo json_encode(['success' => false, 'message' => 'Please fill in all required fields.']);
+    echo json_encode(['success' => false, 'message' => 'Please enter your email and password.']);
     exit;
 }
 
-$email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
+$email = trim($data['email']);
 $password = $data['password'];
 
-// Retrieve the user's record from the database based on the email
-$stmt = $conn->prepare("SELECT user_id, password FROM users WHERE email = ?");
+$stmt = $conn->prepare("SELECT user_id, email, password, user_type, email_verified FROM accounts WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($result->num_rows > 0) {
-    $user = $result->fetch_assoc();
-    $stored_hash = $user['password'];
+if ($row = $result->fetch_assoc()) {
+    if ($row['email_verified'] == 0) {
+        echo json_encode(['success' => false, 'message' => 'Please verify your email before logging in.']);
+        exit;
+    }
 
-    // Verify the password
-    if (password_verify($password, $stored_hash)) {
-        // Passwords match! Login successful
-        $_SESSION['user_id'] = $user['user_id']; // Store user ID in session
-        echo json_encode(['success' => true, 'message' => 'Login successful!']);
+    if (password_verify($password, $row['password'])) {
+        // ✅ Store core session data
+        $_SESSION['user_id'] = $row['user_id'];
+        $_SESSION['user_type'] = $row['user_type'];
+        $_SESSION['email'] = $row['email']; // ✅ Added line for both users & fb_owners
+        $_SESSION['logged_in'] = true;
+
+        // ✅ If fb_owner, fetch fbowner_id & fb_email_address
+        if ($row['user_type'] === 'fb_owner') {
+            $stmt2 = $conn->prepare("SELECT fbowner_id, fb_email_address FROM fb_owner WHERE user_id = ?");
+            $stmt2->bind_param("i", $row['user_id']);
+            $stmt2->execute();
+            $res2 = $stmt2->get_result();
+            if ($owner = $res2->fetch_assoc()) {
+                $_SESSION['fbowner_id'] = $owner['fbowner_id'];
+                $_SESSION['fb_email_address'] = $owner['fb_email_address'];
+            }
+            $stmt2->close();
+        }
+
+        // ✅ Response
+        $redirect = isset($data['redirect']) ? $data['redirect'] : '';
+        echo json_encode([
+            "success" => true,
+            "user_type" => $row['user_type'],
+            "redirect" => $redirect,
+            "fbowner_id" => $_SESSION['fbowner_id'] ?? null
+        ]);
     } else {
-        // Passwords do not match
-        echo json_encode(['success' => false, 'message' => 'Invalid credentials.']);
+        echo json_encode([
+            "success" => false,
+            "message" => "Incorrect Password."
+        ]);
     }
 } else {
-    // User not found
-    echo json_encode(['success' => false, 'message' => 'Invalid credentials.']);
+    echo json_encode([
+        "success" => false,
+        "message" => "User not found."
+    ]);
 }
 
+$stmt->close();
 $conn->close();
 ?>

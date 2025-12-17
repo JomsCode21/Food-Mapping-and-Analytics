@@ -1,16 +1,12 @@
 <?php
-$host = 'localhost';
-$dbname = 'taste_libmanan';
+$host = 'localhost'; // Sometimes different, e.g., '127.0.0.1' or a specific host from your cPanel
+$dbname = 'u366677621_tastelibmanan'; 
 $username = 'root';
-$password = '';
+$password = ''; // the one set in your hosting control panel
 
-// Create connection
 $conn = new mysqli($host, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
-// No need to close the connection here.  It will be closed at the end of the script that includes this file, or automatically when the script finishes.
 ?>
