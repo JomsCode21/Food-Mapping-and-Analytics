@@ -10,6 +10,12 @@ db_con.php
 .DS_Store
 Thumbs.db
 
+# Ignore raw database files
+*.frm
+*.ibd
+*.myd
+*.myi
+
 # --- Optional: Database Dumps ---
 # (I left TASTELIBMANAN.sql accessible so you can import it, 
 # but ignored the 'dump' folder if it contains backups)
