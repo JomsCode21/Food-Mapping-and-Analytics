@@ -1,0 +1,16 @@
+# --- Sensitive Credentials ---
+db_con.php
+
+# --- User Generated Content (Images/Files) ---
+/uploads
+/review_uploads
+
+# --- System & Editor Junk ---
+.history/
+.DS_Store
+Thumbs.db
+
+# --- Optional: Database Dumps ---
+# (I left TASTELIBMANAN.sql accessible so you can import it, 
+# but ignored the 'dump' folder if it contains backups)
+/dump
