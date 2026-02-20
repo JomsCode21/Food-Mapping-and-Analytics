@@ -12,13 +12,35 @@ This system serves as a bridge between local food enthusiasts, food business own
 
 ## 📖 About the Project
 
-Developed as a Bachelor of Science in Information Technology capstone project, TasteLibmanan goes beyond a simple directory. It is an interactive mapping system equipped with detailed analytics, an online permit application portal, and a communication system between vendors and municipal admins.
+Developed as a Bachelor of Science in Information Technology capstone project, TasteLibmanan goes beyond a simple directory. It is an interactive mapping system equipped with detailed analytics, an online permit application portal, and a secure communication system between vendors and municipal admins.
 
 ## ✨ Key Features
 
 * **👨‍🍳 For Food Enthusiasts:** Interactive map, reviews & ratings, and favorites bookmarking.
 * **🏪 For Food Business Owners:** Online permit applications (New/Renewal), menu management, gallery uploads, and real-time application status tracking.
 * **🛡️ For Administrators (BPLO):** Analytics dashboard, vendor management (approve/reject permits), and direct messaging with business owners.
+
+---
+
+## 🔄 System Flow
+
+The system operates on a seamless flow connecting three main user types: BPLO Admins, Business Owners, and Public Users.
+
+### 1. Business Registration & Approval Flow
+> **Business Owner** signs up ➔ Submits Digital BPLO Application (Uploads clearances/docs) ➔ Application marked as "Pending".
+> **BPLO Admin** logs in ➔ Reviews application & downloads requirements ➔ Clicks "Approve" (Sends automated email to Owner).
+> **System** automatically plots the approved business on the live interactive map.
+
+### 2. Business Management Flow
+> **Approved Business Owner** accesses portal ➔ Uploads Menu images & prices ➔ Uploads promotional Gallery photos ➔ Updates business status (Open/Closed).
+
+### 3. User Discovery & Engagement Flow
+> **Public User** visits website ➔ Uses the Interactive Map or Category filters to find food ➔ Clicks a business to view menus and location.
+> **Logged-in User** visits a profile ➔ Leaves a Review & Star Rating ➔ Clicks the ❤️ icon to save to their personal "Favorites" list.
+
+### 4. Analytics Flow
+> **System** records user visits, category preferences, and application statuses.
+> **BPLO Admin** views the real-time Dashboard to monitor local economic trends and system engagement.
 
 ---
 
@@ -62,6 +84,10 @@ DB_HOST=localhost
 DB_NAME=tastelibmanan
 DB_USER=root
 DB_PASS=          # Leave blank if your local XAMPP root user has no password
+
+# App Security
+APP_URL=http://localhost/TasteLibmanan
+APP_SECRET=generate_a_random_secret_string_here
 
 # Email Setup (PHPMailer)
 SMTP_HOST=smtp.gmail.com
