@@ -16,45 +16,58 @@ Developed as a Bachelor of Science in Information Technology capstone project, T
 
 ## ✨ Key Features
 
-### 👨‍🍳 For Food Enthusiasts (Public Users)
-* **📍 Interactive Mapping:** Visually locate nearby cafes, restaurants, bakeries, and street food stalls.
-* **⭐ Reviews & Ratings:** Read community feedback and share your own dining experiences.
-* **❤️ Favorites:** Bookmark your go-to food spots for quick access.
-* **📱 Responsive Design:** Modern, mobile-friendly UI built with Tailwind CSS.
-
-### 🏪 For Food Business Owners
-* **📝 Online Permit Application:** Submit New or Renewal business permit applications directly to the BPLO with document uploads.
-* **📋 Menu & Gallery Management:** Dynamically update your establishment's menus, prices, and upload promotional images.
-* **💬 Admin Chat:** Direct messaging system to communicate with the BPLO/Admin regarding application statuses.
-* **🔔 Live Notifications:** Receive real-time updates and email alerts (via PHPMailer) regarding approval statuses.
-
-### 🛡️ For Administrators (BPLO)
-* **📊 Analytics Dashboard:** Monitor system traffic, user engagement, and total visits per business category.
-* **✅ Vendor Management:** Review, approve, or reject business permit applications and downloaded submitted requirements.
-* **💬 Owner Support:** Respond to inquiries from business owners via the built-in chat system.
+* **👨‍🍳 For Food Enthusiasts:** Interactive map, reviews & ratings, and favorites bookmarking.
+* **🏪 For Food Business Owners:** Online permit applications (New/Renewal), menu management, gallery uploads, and real-time application status tracking.
+* **🛡️ For Administrators (BPLO):** Analytics dashboard, vendor management (approve/reject permits), and direct messaging with business owners.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛑 What You Need (Prerequisites)
 
-* **Frontend:** HTML5, Vanilla JavaScript, [Tailwind CSS](https://tailwindcss.com/)
-* **Backend:** Core PHP
-* **Database:** MySQL
-* **Libraries/Integrations:** * [PHPMailer](https://github.com/PHPMailer/PHPMailer) (for secure OTPs, password resets, and status notifications)
-  * [SweetAlert2](https://sweetalert2.github.io/) (for beautiful UI alerts)
+If you want to download, modify, or run this code on your local machine, you will need the following tools and accounts:
+
+1. **Local Server Environment:** * [XAMPP](https://www.apachefriends.org/index.html), WAMP, or MAMP installed on your machine.
+2. **PHP & MySQL:** * PHP version 7.4 or higher.
+   * MySQL (comes pre-packaged with XAMPP).
+3. **Web Browser:** * Google Chrome, Microsoft Edge, or Mozilla Firefox.
+4. **Google Account (For Email Features):**
+   * The system uses **PHPMailer** to send OTPs, email verifications, and permit approval notifications.
+   * You will need a standard Gmail account and you **MUST generate a Google App Password** (Found in your Google Account Security settings under 2-Step Verification) to use as your SMTP password.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Installation Guide
 
-Follow these instructions to set up the project on your local machine for development and testing.
+Follow these step-by-step instructions to get the system running locally:
 
-### Prerequisites
-* A local web server like [XAMPP](https://www.apachefriends.org/index.html), WAMP, or MAMP.
-* PHP 7.4 or higher.
+### 1. Download the Code
+* Clone the repository or download the ZIP file.
+* Move the `TasteLibmanan` folder into your local server's web directory (e.g., `C:\xampp\htdocs\`).
 
-### Installation
+### 2. Set Up the Database
+* Open your XAMPP Control Panel and start **Apache** and **MySQL**.
+* Open your browser and go to `http://localhost/phpmyadmin`.
+* Click **New** to create a database and name it exactly: `tastelibmanan`.
+* Click on the `Import` tab, select the `TASTELIBMANAN.sql` file located in the project's root folder, and click **Go**.
 
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/yourusername/TasteLibmanan.git](https://github.com/yourusername/TasteLibmanan.git)
+### 3. Configure the Environment Variables (Crucial Step)
+To keep the system secure, credentials are not hardcoded. You must create an environment file.
+* In the root folder of the project, find the file named `.env.example`.
+* Duplicate this file and rename the copy to `.env` (just `.env`, nothing before the dot).
+* Open the `.env` file in a text editor (like VS Code or Notepad) and update the credentials:
+
+```env
+# Database Credentials
+DB_HOST=localhost
+DB_NAME=tastelibmanan
+DB_USER=root
+DB_PASS=          # Leave blank if your local XAMPP root user has no password
+
+# Email Setup (PHPMailer)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_actual_email@gmail.com
+SMTP_PASSWORD=your_google_app_password      # Use the 16-character App Password, NOT your real password!
+SMTP_ENCRYPTION=tls
+SMTP_FROM_EMAIL=your_actual_email@gmail.com
+SMTP_FROM_NAME=Tastelibmanan Admin
