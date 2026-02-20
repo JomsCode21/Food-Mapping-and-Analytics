@@ -56,17 +56,31 @@ require_once '../db_con.php';
                         } else {
                             $mail = new PHPMailer(true);
                             try{
+                                $smtp_host = env_value('SMTP_HOST', 'smtp.gmail.com');
+                                $smtp_port = (int) env_value('SMTP_PORT', '587');
+                                $smtp_user = env_value('SMTP_USERNAME', '');
+                                $smtp_pass = env_value('SMTP_PASSWORD', '');
+                                $smtp_encryption = strtolower(env_value('SMTP_ENCRYPTION', 'tls'));
+                                $smtp_from_email = env_value('SMTP_FROM_EMAIL', $smtp_user);
+                                $smtp_from_name = env_value('SMTP_FROM_NAME', 'TasteLibmanan Admin');
+
+                                if ($smtp_user === '' || $smtp_pass === '' || $smtp_from_email === '') {
+                                    throw new Exception('SMTP credentials are not configured.');
+                                }
+
                                 // Server Configuration
                                 $mail->isSMTP();
-                                $mail->Host = 'smtp.gmail.com';
+                                $mail->Host = $smtp_host;
                                 $mail->SMTPAuth = true;
-                                $mail->Username = 'tastelibmanangit@gmail.com';
-                                $mail->Password = 'jurz haki zrvm jjrk';
-                                $mail->SMTPSecure = 'tls';
-                                $mail->Port = '587';
+                                $mail->Username = $smtp_user;
+                                $mail->Password = $smtp_pass;
+                                $mail->SMTPSecure = $smtp_encryption === 'ssl'
+                                    ? PHPMailer::ENCRYPTION_SMTPS
+                                    : PHPMailer::ENCRYPTION_STARTTLS;
+                                $mail->Port = $smtp_port;
 
                                 //Receipients
-                                $mail->setFrom('tastelibmanangit@gmail.com', 'TasteLibmanan Admin');
+                                $mail->setFrom($smtp_from_email, $smtp_from_name);
                                 $mail->addAddress($email, $name);
                                 $mail->isHTML(true);
                                 $mail->Subject = 'Business Permit Application Status - Rejected';

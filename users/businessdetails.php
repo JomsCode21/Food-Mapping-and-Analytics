@@ -5,6 +5,8 @@ session_start();
 require_once '../db_con.php'; 
 require_once '../status_logic.php';
 
+$maps_api_key = env_value('GOOGLE_MAPS_API_KEY', '');
+
 // Check if public view is enabled
 $isPublicView = isset($_GET['view']) && $_GET['view'] === 'public';
 
@@ -1582,6 +1584,6 @@ function initBusinessMap() {
     }
 
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1A2Mej_RdKT_Lq-y0kYIcNW93yY-RrBY&callback=initBusinessMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo htmlspecialchars($maps_api_key, ENT_QUOTES, 'UTF-8'); ?>&callback=initBusinessMap" async defer></script>
 </body>
 </html>

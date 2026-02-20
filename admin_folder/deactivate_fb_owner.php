@@ -37,17 +37,32 @@ if (isset($_POST['user_id'])) {
                         //Sending Email Notifiction.
                         $mail = new PHPMailer(true);
                         try {
+                            $smtp_host = env_value('SMTP_HOST', 'smtp.gmail.com');
+                            $smtp_port = (int) env_value('SMTP_PORT', '587');
+                            $smtp_user = env_value('SMTP_USERNAME', '');
+                            $smtp_pass = env_value('SMTP_PASSWORD', '');
+                            $smtp_encryption = strtolower(env_value('SMTP_ENCRYPTION', 'tls'));
+                            $smtp_from_email = env_value('SMTP_FROM_EMAIL', $smtp_user);
+                            $smtp_from_name = env_value('SMTP_FROM_NAME', 'Tastelibmanan Admin');
+                            $app_url = rtrim(env_value('APP_URL', 'http://localhost/tastelibmanan/tastelibmanan'), '/');
+
+                            if ($smtp_user === '' || $smtp_pass === '' || $smtp_from_email === '') {
+                                throw new Exception('SMTP credentials are not configured.');
+                            }
+
                             // Server Settings
                             $mail->isSMTP();
-                            $mail->Host = 'smtp.gmail.com';
+                            $mail->Host = $smtp_host;
                             $mail->SMTPAuth = true;
-                            $mail->Username = 'tastelibmanangit@gmail.com';
-                            $mail->Password = 'jurz haki zrvm jjrk';
-                            $mail->SMTPSecure = 'tls';
-                            $mail->Port = 587;
+                            $mail->Username = $smtp_user;
+                            $mail->Password = $smtp_pass;
+                            $mail->SMTPSecure = $smtp_encryption === 'ssl'
+                                ? PHPMailer::ENCRYPTION_SMTPS
+                                : PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port = $smtp_port;
 
                             //Receipients
-                            $mail->setFrom('tastelibmanangit@gmail.com', 'Tastelibmanan Admin');
+                            $mail->setFrom($smtp_from_email, $smtp_from_name);
                             $mail->addAddress($email, $name);
                             $mail->isHTML(true);
                             $mail->Subject = 'Your Privilage as a Food Business Owner';
@@ -68,7 +83,7 @@ if (isset($_POST['user_id'])) {
                                             <p style="font-size: 1rem; color: #374151; margin-bottom: 20px;">
                                                 Click the button below to fully access your account:
                                             </p>
-                                            <a href="http://localhost/tastelibmanan/tastelibmanan/index.php" style="display:inline-block; background: #2563eb; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; box-shadow: 0 1px 4px rgba(37,99,235,0.12);">TasteLibmanan</a>
+                                            <a href="' . htmlspecialchars($app_url, ENT_QUOTES, 'UTF-8') . '/index.php" style="display:inline-block; background: #2563eb; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; box-shadow: 0 1px 4px rgba(37,99,235,0.12);">TasteLibmanan</a>
                                         </div>
                                         <p style="font-size: 0.95rem; color: #6b7280; text-align:left;">Sincerly,<br><span style="color: #2563eb;">BPLO - Libmanan</span></p>
                                     </div>

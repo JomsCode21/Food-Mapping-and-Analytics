@@ -8,6 +8,8 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../db_con.php';
 require_once '../status_logic.php';
 
+$maps_api_key = env_value('GOOGLE_MAPS_API_KEY', '');
+
 // Enable Error Reporting
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -115,7 +117,7 @@ $conn->close();
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1A2Mej_RdKT_Lq-y0kYIcNW93yY-RrBY"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo htmlspecialchars($maps_api_key, ENT_QUOTES, 'UTF-8'); ?>"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>

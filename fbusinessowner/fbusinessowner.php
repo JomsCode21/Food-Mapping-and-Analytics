@@ -3,6 +3,8 @@ session_start();
 require_once '../db_con.php'; // Make sure this sets $conn as MySQLi
 require_once '../status_logic.php';
 
+$maps_api_key = env_value('GOOGLE_MAPS_API_KEY', '');
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     $redirect1 = urlencode($_SERVER['REQUEST_URI']);
@@ -1099,7 +1101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1A2Mej_RdKT_Lq-y0kYIcNW93yY-RrBY&callback=initBusinessMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=<?php echo htmlspecialchars($maps_api_key, ENT_QUOTES, 'UTF-8'); ?>&callback=initBusinessMap"></script>
 
     <?php
     $fbowner_id = $fb_id;

@@ -90,64 +90,65 @@ if ($current_count > 0 && $needs_update) {
         }
 
         // --- GOOGLE GEMINI API CALL (FREE TIER) ---
-        
-        // PASTE YOUR NEW GEMINI API KEY HERE
-        $apiKey = 'AIzaSyDcyc26AngMYXcQ3x2W8_b-E2g1m1oGV64'; 
-        
-        $apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $apiKey;
 
-        $apiData = [
-            "contents" => [
-                [
-                    "parts" => [
-                        ["text" => $final_prompt]
+        $apiKey = env_value('GEMINI_API_KEY', '');
+
+        if ($apiKey === '') {
+            $cached_summary = 'AI summary unavailable. Missing API key.';
+        } else {
+            $apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $apiKey;
+
+            $apiData = [
+                "contents" => [
+                    [
+                        "parts" => [
+                            ["text" => $final_prompt]
+                        ]
                     ]
                 ]
-            ]
-        ];
+            ];
 
-        $ch = curl_init($apiUrl);
-        
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apiData));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Fix for XAMPP
+            $ch = curl_init($apiUrl);
 
-        $api_response = curl_exec($ch);
-        $curl_error = curl_error($ch);
-        curl_close($ch);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apiData));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Fix for XAMPP
 
-        if (!$curl_error) {
-            $result = json_decode($api_response, true);
-            
-            // Check for success
-            if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-                $new_summary = $result['candidates'][0]['content']['parts'][0]['text'];
-                $new_summary = str_replace(['**', '*'], '', $new_summary); // Clean Markdown stars
-                
-                $cache_data[$rating_filter] = [
-                    'count' => $current_count,
-                    'summary' => $new_summary,
-                    'last_updated' => date("Y-m-d H:i:s")
-                ];
-                
-                file_put_contents($cache_file, json_encode($cache_data));
-                
-                echo json_encode(['status' => 'success', 'summary' => $new_summary, 'count' => $current_count]);
-                exit;
-            } 
-            // ERROR HANDLING
-            else {
+            $api_response = curl_exec($ch);
+            $curl_error = curl_error($ch);
+            curl_close($ch);
+
+            if (!$curl_error) {
+                $result = json_decode($api_response, true);
+
+                // Check for success
+                if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
+                    $new_summary = $result['candidates'][0]['content']['parts'][0]['text'];
+                    $new_summary = str_replace(['**', '*'], '', $new_summary); // Clean Markdown stars
+
+                    $cache_data[$rating_filter] = [
+                        'count' => $current_count,
+                        'summary' => $new_summary,
+                        'last_updated' => date("Y-m-d H:i:s")
+                    ];
+
+                    file_put_contents($cache_file, json_encode($cache_data));
+
+                    echo json_encode(['status' => 'success', 'summary' => $new_summary, 'count' => $current_count]);
+                    exit;
+                }
+                // ERROR HANDLING
                 if (isset($result['error']['message'])) {
                     $cached_summary = "Gemini Error: " . $result['error']['message'];
                 } else {
                     $cached_summary = "AI Summary unavailable. Recent feedback: " . substr($reviews_text, 0, 300) . "...";
                 }
+            } else {
+                $cached_summary = "Connection Error: " . $curl_error;
             }
-        } else {
-            $cached_summary = "Connection Error: " . $curl_error;
         }
     } else {
         $cached_summary = "There are ratings, but no written comments to summarize.";

@@ -216,15 +216,29 @@ if (!$user_id) {
                     if (!empty($user_email) && !empty($user_name)) {
                         $mail = new PHPMailer(true);
                         try {
-                            $mail->isSMTP();
-                            $mail->Host = 'smtp.gmail.com';
-                            $mail->SMTPAuth = true;
-                            $mail->Username = 'tastelibmanangit@gmail.com';
-                            $mail->Password = 'jurz haki zrvm jjrk';
-                            $mail->SMTPSecure = 'tls';
-                            $mail->Port = 587;
+                            $smtp_host = env_value('SMTP_HOST', 'smtp.gmail.com');
+                            $smtp_port = (int) env_value('SMTP_PORT', '587');
+                            $smtp_user = env_value('SMTP_USERNAME', '');
+                            $smtp_pass = env_value('SMTP_PASSWORD', '');
+                            $smtp_encryption = strtolower(env_value('SMTP_ENCRYPTION', 'tls'));
+                            $smtp_from_email = env_value('SMTP_FROM_EMAIL', $smtp_user);
+                            $smtp_from_name = env_value('SMTP_FROM_NAME', 'Tastelibmanan Admin');
 
-                            $mail->setFrom('tastelibmanangit@gmail.com', 'Tastelibmanan Admin');
+                            if ($smtp_user === '' || $smtp_pass === '' || $smtp_from_email === '') {
+                                throw new Exception('SMTP credentials are not configured.');
+                            }
+
+                            $mail->isSMTP();
+                            $mail->Host = $smtp_host;
+                            $mail->SMTPAuth = true;
+                            $mail->Username = $smtp_user;
+                            $mail->Password = $smtp_pass;
+                            $mail->SMTPSecure = $smtp_encryption === 'ssl'
+                                ? PHPMailer::ENCRYPTION_SMTPS
+                                : PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port = $smtp_port;
+
+                            $mail->setFrom($smtp_from_email, $smtp_from_name);
                             $mail->addAddress($user_email, $user_name);
                             $mail->isHTML(true);
                             $mail->Subject = 'Your Business Permit Application is Pending - BPLO Libmanan';
@@ -467,15 +481,29 @@ if (!$user_id) {
         if (!empty($user_email_renewal) && !empty($user_name_renewal)) {
             $mail_renewal = new PHPMailer(true);
             try {
+                $smtp_host = env_value('SMTP_HOST', 'smtp.gmail.com');
+                $smtp_port = (int) env_value('SMTP_PORT', '587');
+                $smtp_user = env_value('SMTP_USERNAME', '');
+                $smtp_pass = env_value('SMTP_PASSWORD', '');
+                $smtp_encryption = strtolower(env_value('SMTP_ENCRYPTION', 'tls'));
+                $smtp_from_email = env_value('SMTP_FROM_EMAIL', $smtp_user);
+                $smtp_from_name = env_value('SMTP_FROM_NAME', 'Tastelibmanan Admin');
+
+                if ($smtp_user === '' || $smtp_pass === '' || $smtp_from_email === '') {
+                    throw new Exception('SMTP credentials are not configured.');
+                }
+
                 $mail_renewal->isSMTP();
-                $mail_renewal->Host = 'smtp.gmail.com';
+                $mail_renewal->Host = $smtp_host;
                 $mail_renewal->SMTPAuth = true;
-                $mail_renewal->Username = 'tastelibmanangit@gmail.com';
-                $mail_renewal->Password = 'jurz haki zrvm jjrk';
-                $mail_renewal->SMTPSecure = 'tls';
-                $mail_renewal->Port = 587;
+                $mail_renewal->Username = $smtp_user;
+                $mail_renewal->Password = $smtp_pass;
+                $mail_renewal->SMTPSecure = $smtp_encryption === 'ssl'
+                    ? PHPMailer::ENCRYPTION_SMTPS
+                    : PHPMailer::ENCRYPTION_STARTTLS;
+                $mail_renewal->Port = $smtp_port;
               
-                $mail_renewal->setFrom('tastelibmanangit@gmail.com', 'Tastelibmanan Admin');
+                $mail_renewal->setFrom($smtp_from_email, $smtp_from_name);
                 $mail_renewal->addAddress($user_email_renewal, $user_name_renewal);
                 $mail_renewal->isHTML(true);
                 $mail_renewal->Subject = 'Your Business Permit Application is Pending - BPLO Libmanan';

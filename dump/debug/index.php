@@ -1,4 +1,10 @@
 <?php
+require_once __DIR__ . '/../../env.php';
+
+$db_host = env_value('DB_HOST', 'localhost');
+$db_name = env_value('DB_NAME', 'tastelibmanan');
+$db_user = env_value('DB_USER', 'root');
+$db_pass = env_value('DB_PASS', '');
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $uploadedFiles = $_FILES['files'];
@@ -33,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($fileData)) {
         $jsonFiles = json_encode($fileData);
 
-        $pdo = new PDO('mysql:host=localhost;dbname=tastelibmanan', 'root', ''); // Change credentials
+        $pdo = new PDO("mysql:host={$db_host};dbname={$db_name}", $db_user, $db_pass);
         $stmt = $pdo->prepare("INSERT INTO test_galleries (files_json) VALUES (:files_json)");
         $stmt->execute(['files_json' => $jsonFiles]);
 
@@ -61,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h3>Uploaded Files:</h3>
     <?php
     // Display all uploaded files
-    $pdo = new PDO('mysql:host=localhost;dbname=tastelibmanan', 'root', '');
+    $pdo = new PDO("mysql:host={$db_host};dbname={$db_name}", $db_user, $db_pass);
     $stmt = $pdo->query("SELECT * FROM test_galleries ORDER BY created_at DESC");
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {

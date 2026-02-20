@@ -67,21 +67,36 @@ try {
     // Send verification email
     $mail = new PHPMailer(true);
     try {
+        $smtp_host = env_value('SMTP_HOST', 'smtp.gmail.com');
+        $smtp_port = (int) env_value('SMTP_PORT', '587');
+        $smtp_user = env_value('SMTP_USERNAME', '');
+        $smtp_pass = env_value('SMTP_PASSWORD', '');
+        $smtp_encryption = strtolower(env_value('SMTP_ENCRYPTION', 'tls'));
+        $smtp_from_email = env_value('SMTP_FROM_EMAIL', $smtp_user);
+        $smtp_from_name = env_value('SMTP_FROM_NAME', 'Tastelibmanan Admin');
+
+        if ($smtp_user === '' || $smtp_pass === '' || $smtp_from_email === '') {
+            throw new Exception('SMTP credentials are not configured.');
+        }
+
         // Server settings
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
+        $mail->Host = $smtp_host;
         $mail->SMTPAuth = true;
-        $mail->Username = 'tastelibmanangit@gmail.com';
-        $mail->Password = 'jurz haki zrvm jjrk';
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
+        $mail->Username = $smtp_user;
+        $mail->Password = $smtp_pass;
+        $mail->SMTPSecure = $smtp_encryption === 'ssl'
+            ? PHPMailer::ENCRYPTION_SMTPS
+            : PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = $smtp_port;
 
         // Recipients
-        $mail->setFrom('tastelibmanangit@gmail.com', 'Tastelibmanan Admin');
+        $mail->setFrom($smtp_from_email, $smtp_from_name);
         $mail->addAddress($email, $name);
 
         // Content
-        $verification_link = "https://tastelibmanan.systemproj.com/verify_email.php?code=$verification_code";
+        $app_url = rtrim(env_value('APP_URL', 'https://tastelibmanan.systemproj.com'), '/');
+        $verification_link = $app_url . "/verify_email.php?code=$verification_code";
         $mail->isHTML(true);
         $mail->Subject = 'Verify Your Email - Libmanan Food';
         $mail->Body = "

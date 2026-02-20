@@ -1,8 +1,10 @@
 <?php
-$host = 'localhost';
-$dbname = 'TASTELIBMANAN';
-$username = 'root';
-$password = '';
+require_once __DIR__ . '/../../env.php';
+
+$host = env_value('DB_HOST', 'localhost');
+$dbname = env_value('DB_NAME', 'TASTELIBMANAN');
+$username = env_value('DB_USER', 'root');
+$password = env_value('DB_PASS', '');
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $dbname);

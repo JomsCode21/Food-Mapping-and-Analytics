@@ -19,7 +19,8 @@ function generateOTP() {
 }
 
 function hashToken($email, $otp) {
-    return hash('sha256', $email . $otp . 'your-secret-key');
+    $secret = env_value('APP_SECRET', '');
+    return hash('sha256', $email . $otp . $secret);
 }
 
 if ($step === 'send_otp') {
@@ -47,16 +48,30 @@ if ($step === 'send_otp') {
     // Send email
     $mail = new PHPMailer(true);
     try {
+        $smtp_host = env_value('SMTP_HOST', 'smtp.gmail.com');
+        $smtp_port = (int) env_value('SMTP_PORT', '587');
+        $smtp_user = env_value('SMTP_USERNAME', '');
+        $smtp_pass = env_value('SMTP_PASSWORD', '');
+        $smtp_encryption = strtolower(env_value('SMTP_ENCRYPTION', 'tls'));
+        $smtp_from_email = env_value('SMTP_FROM_EMAIL', $smtp_user);
+        $smtp_from_name = env_value('SMTP_FROM_NAME', 'TasteLibmanan');
+
+        if ($smtp_user === '' || $smtp_pass === '' || $smtp_from_email === '') {
+            throw new Exception('SMTP credentials are not configured.');
+        }
+
         // SMTP config
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com'; // Use your SMTP host
+        $mail->Host = $smtp_host; // Use your SMTP host
         $mail->SMTPAuth = true;
-        $mail->Username = 'tastelibmanangit@gmail.com'; // Your email
-        $mail->Password = 'jurz haki zrvm jjrk'; // App password
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
+        $mail->Username = $smtp_user; // SMTP username
+        $mail->Password = $smtp_pass; // SMTP password
+        $mail->SMTPSecure = $smtp_encryption === 'ssl'
+            ? PHPMailer::ENCRYPTION_SMTPS
+            : PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = $smtp_port;
 
-        $mail->setFrom('tastelibmanangit@gmail.com', 'TasteLibmanan');
+        $mail->setFrom($smtp_from_email, $smtp_from_name);
         $mail->addAddress($email);
         $mail->Subject = 'Account Recovery - OTP Code';
         $mail->Body = '

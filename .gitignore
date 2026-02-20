@@ -1,5 +1,6 @@
 # --- Sensitive Credentials ---
 db_con.php
+.env
 
 # --- User Generated Content (Images/Files) ---
 /uploads
