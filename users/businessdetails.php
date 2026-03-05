@@ -412,6 +412,7 @@ if ($user_id && !$isPublicView) {
                             if ($result->num_rows > 0) {
                                 $current_category = null;
                                 while ($row = $result->fetch_assoc()) {
+                                    $menu_id     = (int)$row['menu_id'];
                                     $menu_name   = htmlspecialchars($row['menu_name']);
                                     $menu_price  = htmlspecialchars($row['menu_price']);
                                     $menu_image  = htmlspecialchars($row['menu_image']);
@@ -419,6 +420,12 @@ if ($user_id && !$isPublicView) {
                                     $cat_name    = $categories[$cat_id] ?? "Uncategorized";
                                     
                                     $is_available = isset($row['is_available']) ? (int)$row['is_available'] : 1;
+                                    $availability_attr = $is_available ? '1' : '0';
+                                    $card_interaction_class = $is_available ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none';
+                                    $image_class = $is_available ? '' : 'grayscale opacity-75';
+                                    $image_hover_class = $is_available ? 'group-hover:scale-110' : '';
+                                    $overlay_class = $is_available ? 'hidden' : '';
+                                    $text_class = $is_available ? 'hidden' : '';
                                 
                                     if ($current_category !== $cat_name) {
                                         if ($current_category !== null) echo '</div>'; 
@@ -426,33 +433,28 @@ if ($user_id && !$isPublicView) {
                                         echo '<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">';
                                         $current_category = $cat_name;
                                     }
-                                    $overlay = '';
-                                    $image_class = '';
-                                    
-                                    if (!$is_available) {
-                                        // Gray out the image
-                                        $image_class = 'grayscale opacity-75';
-                                        $overlay = '<div class="absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
-                                                        <span class="bg-red-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded shadow uppercase tracking-wide">Unavailable</span>
-                                                    </div>';
-                                    }
 
                                     echo "
-                                    <div class='bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group cursor-pointer menu-item-trigger relative'
+                                        <div class='bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group $card_interaction_class menu-item-trigger relative'
+                                         data-menu-id='$menu_id'
+                                         data-available='$availability_attr'
                                          data-img='../$menu_image' 
                                          data-name='".addslashes($menu_name)."' 
                                          data-price='$menu_price'
                                          onclick='openGallery(this)'>
                                         
                                         <div class='h-32 overflow-hidden relative'>
-                                            <img src='../$menu_image' class='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 $image_class' alt='$menu_name'>
-                                            
-                                            $overlay
+                                            <img src='../$menu_image' class='menu-item-image w-full h-full object-cover transition-transform duration-500 $image_hover_class $image_class' alt='$menu_name'>
+
+                                            <div class='absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-[1px] menu-unavailable-overlay $overlay_class'>
+                                                <span class='bg-red-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded shadow uppercase tracking-wide'>Unavailable</span>
+                                            </div>
                                         </div>
                                         
                                         <div class='p-3'>
                                             <p class='font-medium text-gray-800 text-sm truncate' title='$menu_name'>$menu_name</p>
                                             <p class='text-red-600 font-bold text-sm mt-1'>₱$menu_price</p>
+                                            <p class='menu-unavailable-text text-[11px] text-red-600 font-semibold mt-1 $text_class'>Currently unavailable</p>
                                         </div>
                                     </div>";
                                 }
@@ -800,6 +802,7 @@ if ($user_id && !$isPublicView) {
             <div>
                 <h3 id="modalName" class="font-bold text-lg text-gray-900"></h3>
                 <p id="modalPrice" class="text-red-600 font-bold text-xl mt-1"></p>
+                <p id="modalAvailability" class="hidden text-red-600 text-sm font-semibold mt-1">Currently unavailable</p>
             </div>
             <div class="text-gray-400 text-xs md:hidden">
                 <i class="ri-arrow-left-s-line"></i> Swipe <i class="ri-arrow-right-s-line"></i>
@@ -968,19 +971,25 @@ if ($user_id && !$isPublicView) {
     
     // Initialize the Gallery
     function openGallery(element) {
+        const clickedIsAvailable = parseInt(element.getAttribute('data-available') || '1', 10) === 1;
+        if (!clickedIsAvailable) return;
+
         // Collect all menu items currently on the page
-        const elements = document.querySelectorAll('.menu-item-trigger');
+        const elements = document.querySelectorAll('.menu-item-trigger[data-available="1"]');
         galleryItems = Array.from(elements).map(el => ({
+            menuId: el.getAttribute('data-menu-id'),
             img: el.getAttribute('data-img'),
             name: el.getAttribute('data-name'),
-            price: el.getAttribute('data-price')
+            price: el.getAttribute('data-price'),
+            isAvailable: parseInt(el.getAttribute('data-available') || '1', 10) === 1
         }));
 
         // Find the index of the clicked element
         currentGalleryIndex = galleryItems.findIndex(item => 
-            item.img === element.getAttribute('data-img') && 
-            item.name === element.getAttribute('data-name')
+            String(item.menuId) === String(element.getAttribute('data-menu-id'))
         );
+
+        if (currentGalleryIndex < 0) currentGalleryIndex = 0;
 
         updateModalContent();
         document.getElementById('imageModal').classList.remove('hidden');
@@ -994,6 +1003,41 @@ if ($user_id && !$isPublicView) {
         document.getElementById('modalImg').src = item.img;
         document.getElementById('modalName').textContent = item.name;
         document.getElementById('modalPrice').textContent = item.price ? "₱" + item.price : "";
+
+        const modalAvailability = document.getElementById('modalAvailability');
+        if (item.isAvailable) {
+            modalAvailability.classList.add('hidden');
+        } else {
+            modalAvailability.classList.remove('hidden');
+        }
+    }
+
+    function setMenuCardAvailability(cardElement, isAvailable) {
+        if (!cardElement) return;
+
+        cardElement.setAttribute('data-available', isAvailable ? '1' : '0');
+        cardElement.classList.toggle('pointer-events-none', !isAvailable);
+        cardElement.classList.toggle('cursor-not-allowed', !isAvailable);
+        cardElement.classList.toggle('cursor-pointer', isAvailable);
+        cardElement.classList.toggle('hover:shadow-md', isAvailable);
+
+        const image = cardElement.querySelector('.menu-item-image');
+        const overlay = cardElement.querySelector('.menu-unavailable-overlay');
+        const statusText = cardElement.querySelector('.menu-unavailable-text');
+
+        if (image) {
+            image.classList.toggle('grayscale', !isAvailable);
+            image.classList.toggle('opacity-75', !isAvailable);
+            image.classList.toggle('group-hover:scale-110', isAvailable);
+        }
+
+        if (overlay) {
+            overlay.classList.toggle('hidden', isAvailable);
+        }
+
+        if (statusText) {
+            statusText.classList.toggle('hidden', isAvailable);
+        }
     }
 
     // Close Function
@@ -1451,6 +1495,53 @@ if ($user_id && !$isPublicView) {
     // --- Realtime Status Update ---
     const businessUserId = <?php echo json_encode($business['user_id'] ?? $fbowner_id ?? $user_id); ?>;
     let lastStatus = <?php echo json_encode(strtolower($business['fb_status'] ?? 'closed')); ?>;
+    const businessOwnerId = <?php echo json_encode((int)$fbowner_id); ?>;
+
+    function syncMenuAvailability() {
+        fetch('get_menu_statuses.php?fbowner_id=' + encodeURIComponent(businessOwnerId) + '&t=' + Date.now())
+        .then(r => r.json())
+        .then(d => {
+            if (!d || !Array.isArray(d.statuses)) return;
+
+            const statusMap = {};
+            d.statuses.forEach(item => {
+                const id = String(item.menu_id);
+                statusMap[id] = parseInt(item.is_available, 10) === 1;
+            });
+
+            document.querySelectorAll('.menu-item-trigger[data-menu-id]').forEach(card => {
+                const menuId = String(card.getAttribute('data-menu-id'));
+                if (Object.prototype.hasOwnProperty.call(statusMap, menuId)) {
+                    setMenuCardAvailability(card, statusMap[menuId]);
+                }
+            });
+
+            if (Array.isArray(galleryItems) && galleryItems.length > 0) {
+                galleryItems = galleryItems.map(item => {
+                    const menuId = String(item.menuId || '');
+                    if (Object.prototype.hasOwnProperty.call(statusMap, menuId)) {
+                        return Object.assign({}, item, { isAvailable: statusMap[menuId] });
+                    }
+                    return item;
+                });
+            }
+
+            if (!document.getElementById('imageModal').classList.contains('hidden') && galleryItems[currentGalleryIndex]) {
+                const currentItem = galleryItems[currentGalleryIndex];
+                const modalMenuId = String(currentItem.menuId || '');
+                if (Object.prototype.hasOwnProperty.call(statusMap, modalMenuId)) {
+                    currentItem.isAvailable = statusMap[modalMenuId];
+                    updateModalContent();
+                }
+            }
+        })
+        .catch(() => {
+            // Keep UI responsive even if status polling occasionally fails.
+        });
+    }
+
+    syncMenuAvailability();
+    setInterval(syncMenuAvailability, 3000);
 
     setInterval(() => {
         fetch('get_status.php?user_id=' + businessUserId + '&t=' + Date.now())

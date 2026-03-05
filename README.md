@@ -4,7 +4,7 @@
 ![Tech Stack](https://img.shields.io/badge/Tech_Stack-PHP_|_MySQL_|_Tailwind-blue?style=for-the-badge)
 ![Academic](https://img.shields.io/badge/Project-BSIT_Capstone-orange?style=for-the-badge)
 
-Welcome to **TasteLibmanan**, a comprehensive web-based platform designed to map, explore, and analyze local food establishments in Libmanan. 
+Welcome to **TasteLibmanan**, a comprehensive web-based platform designed to map, explore, and analyze local food establishments in Libmanan.
 
 This system serves as a bridge between local food enthusiasts, food business owners, and the Business Permits and Licensing Office (BPLO) of Libmanan, streamlining both the discovery of local flavors and the administrative processing of business permits.
 
@@ -27,18 +27,22 @@ Developed as a Bachelor of Science in Information Technology capstone project, T
 The system operates on a seamless flow connecting three main user types: BPLO Admins, Business Owners, and Public Users.
 
 ### 1. Business Registration & Approval Flow
+>
 > **Business Owner** signs up ➔ Submits Digital BPLO Application (Uploads clearances/docs) ➔ Application marked as "Pending".
 > **BPLO Admin** logs in ➔ Reviews application & downloads requirements ➔ Clicks "Approve" (Sends automated email to Owner).
 > **System** automatically plots the approved business on the live interactive map.
 
 ### 2. Business Management Flow
+>
 > **Approved Business Owner** accesses portal ➔ Uploads Menu images & prices ➔ Uploads promotional Gallery photos ➔ Updates business status (Open/Closed).
 
 ### 3. User Discovery & Engagement Flow
+>
 > **Public User** visits website ➔ Uses the Interactive Map or Category filters to find food ➔ Clicks a business to view menus and location.
 > **Logged-in User** visits a profile ➔ Leaves a Review & Star Rating ➔ Clicks the ❤️ icon to save to their personal "Favorites" list.
 
 ### 4. Analytics Flow
+>
 > **System** records user visits, category preferences, and application statuses.
 > **BPLO Admin** views the real-time Dashboard to monitor local economic trends and system engagement.
 
@@ -63,17 +67,36 @@ If you want to download, modify, or run this code on your local machine, you wil
 Follow these step-by-step instructions to get the system running locally:
 
 ### 1. Download the Code
+
 * Clone the repository or download the ZIP file.
 * Move the `TasteLibmanan` folder into your local server's web directory (e.g., `C:\xampp\htdocs\`).
 
 ### 2. Set Up the Database
+
 * Open your XAMPP Control Panel and start **Apache** and **MySQL**.
 * Open your browser and go to `http://localhost/phpmyadmin`.
 * Click **New** to create a database and name it exactly: `tastelibmanan`.
-* Click on the `Import` tab, select the `TASTELIBMANAN.sql` file located in the project's root folder, and click **Go**.
+* Click on the `Import` tab, select `database/TASTELIBMANAN.sql` (or the legacy root copy `TASTELIBMANAN.sql`), and click **Go**.
+
+### 2.1 Project Layout (Organized)
+
+The project now keeps setup and utility scripts in dedicated folders for easier navigation:
+
+* `users/` - user-facing pages and APIs
+* `fbusinessowner/` - business owner pages and APIs
+* `admin_folder/` - admin pages and APIs
+* `tools/` - diagnostics, setup, cron, and utility scripts
+* `database/` - SQL schema and migration files
+* `uploads/` - user and business uploaded assets
+
+Compatibility note:
+
+* Legacy root utility paths such as `diagnostics.php`, `setup_database.php`, and `test_connection.php` still work through lightweight wrappers.
 
 ### 3. Configure the Environment Variables (Crucial Step)
+
 To keep the system secure, credentials are not hardcoded. You must create an environment file.
+
 * In the root folder of the project, find the file named `.env.example`.
 * Duplicate this file and rename the copy to `.env` (just `.env`, nothing before the dot).
 * Open the `.env` file in a text editor (like VS Code or Notepad) and update the credentials:

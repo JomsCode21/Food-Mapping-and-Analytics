@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once '../db_con.php'; 
+require_once '../db_con.php';
+require_once '../upload_utils.php';
 
 header('Content-Type: application/json');
 
@@ -17,49 +18,54 @@ if (!in_array($type, ['logo', 'cover']) || empty($_FILES['file']['name'])) {
     exit();
 }
 
-// Fetch Business Name to generate the folder name
-$stmt = $conn->prepare("SELECT fb_name FROM fb_owner WHERE user_id = ?");
+if (!tlm_is_uploaded_image($_FILES['file']['tmp_name'])) {
+    echo json_encode(['success' => false, 'message' => 'Only image files are allowed.']);
+    exit();
+}
+
+// Fetch business name and current file path for cleanup on replace.
+$stmt = $conn->prepare("SELECT fb_name, fb_photo, fb_cover FROM fb_owner WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $res = $stmt->get_result();
 $row = $res->fetch_assoc();
 
-// Folder Naming Logic (Matched to your snippet)
 $business_name = $row['fb_name'] ?? 'default';
 $business_folder = preg_replace('/[^A-Za-z0-9_\-]/', '_', $business_name);
+$oldPath = $type === 'logo' ? ($row['fb_photo'] ?? '') : ($row['fb_cover'] ?? '');
 
-// Set Paths based on Type
-$filename = uniqid() . '_' . basename($_FILES['file']['name']);
+$ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+$ext = $ext !== '' ? $ext : 'jpg';
+$filename = uniqid($type . '_', true) . '.' . $ext;
 
 if ($type === 'logo') {
     $upload_dir = "../uploads/business_photo/" . $business_folder . "/";
     $db_column = "fb_photo";
-    // Path string format for Database
     $relative_path_for_db = 'uploads/business_photo/' . $business_folder . '/' . $filename;
 } else {
     $upload_dir = "../uploads/business_cover/" . $business_folder . "/";
     $db_column = "fb_cover";
-    // Path string format for Database
     $relative_path_for_db = 'uploads/business_cover/' . $business_folder . '/' . $filename;
 }
 
-// Ensure directory exists
-if (!is_dir($upload_dir)) { mkdir($upload_dir, 0777, true); }
+if (!is_dir($upload_dir)) {
+    mkdir($upload_dir, 0777, true);
+}
 
 $target_file = $upload_dir . $filename;
 
-// 4. Process Upload
-if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
-    
-    // Update Database
+if (tlm_store_uploaded_with_compression($_FILES['file']['tmp_name'], $target_file)) {
     $update = $conn->prepare("UPDATE fb_owner SET $db_column = ? WHERE user_id = ?");
     $update->bind_param("si", $relative_path_for_db, $user_id);
-    
+
     if ($update->execute()) {
+        if (!empty($oldPath) && tlm_normalize_stored_path($oldPath) !== tlm_normalize_stored_path($relative_path_for_db)) {
+            tlm_delete_storage_file($oldPath, dirname(__DIR__));
+        }
+
         echo json_encode([
-            'success' => true, 
-            // We add '../' here so the frontend JS can display it immediately without reload
-            'new_src' => '../' . $relative_path_for_db, 
+            'success' => true,
+            'new_src' => '../' . $relative_path_for_db,
             'message' => ucfirst($type) . ' updated successfully!'
         ]);
     } else {

@@ -18,6 +18,6 @@ Thumbs.db
 *.myi
 
 # --- Optional: Database Dumps ---
-# (I left TASTELIBMANAN.sql accessible so you can import it, 
+# (I left TASTELIBMANAN.sql accessible so you can import it,
 # but ignored the 'dump' folder if it contains backups)
 /dump

@@ -227,16 +227,22 @@ if (file_exists('db_con.php')) {
                 <div class="lg:w-1/2 relative hidden lg:block" data-aos="fade-left" data-aos-duration="1000">
                   <?php
                     if ($conn) {
+                      // Check if connection exists before querying
                       $featured_img_sql = "SELECT f.*, 
                             (SELECT AVG(rating) FROM reviews WHERE fbowner_id = f.fbowner_id) as avg_rating 
                             FROM fb_owner f 
-                            WHERE f.activation = 'Active' 
                             ORDER BY avg_rating DESC 
                             LIMIT 1";
 
                       $featured_img_result = mysqli_query($conn, $featured_img_sql);
+                      
+                      // Fallback if reviews table doesn't exist
+                      if(!$featured_img_result) {
+                          $featured_img_sql = "SELECT *, 0 as avg_rating FROM fb_owner LIMIT 1";
+                          $featured_img_result = mysqli_query($conn, $featured_img_sql);
+                      }
 
-                      if (mysqli_num_rows($featured_img_result) > 0) {
+                      if ($featured_img_result && mysqli_num_rows($featured_img_result) > 0) {
                         while ($row = mysqli_fetch_assoc($featured_img_result)) {
                           $featured_photo = $row['fb_photo'];
                           $clean_featured_photo = str_replace('../', '', $featured_photo);
@@ -376,7 +382,6 @@ if (file_exists('db_con.php')) {
                     $sql = "SELECT f.*, 
                             (SELECT AVG(rating) FROM reviews WHERE fbowner_id = f.fbowner_id) as avg_rating 
                             FROM fb_owner f 
-                            WHERE f.activation = 'Active' 
                             ORDER BY avg_rating DESC 
                             LIMIT 4";
                     
@@ -384,7 +389,7 @@ if (file_exists('db_con.php')) {
                   
                     // Fallback if reviews table doesn't exist yet
                     if(!$result) {
-                        $sql = "SELECT *, 0 as avg_rating FROM fb_owner WHERE activation = 'Active' LIMIT 4";
+                        $sql = "SELECT *, 0 as avg_rating FROM fb_owner LIMIT 4";
                         $result = mysqli_query($conn, $sql);
                     }
                   

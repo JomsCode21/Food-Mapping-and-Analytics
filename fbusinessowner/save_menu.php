@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 session_start();
 require_once '../db_con.php'; // your database connection
-
+require_once '../upload_utils.php';
 
 // ✅ Ensure the business owner is logged in
 if (!isset($_SESSION['fbowner_id'])) {
@@ -51,11 +51,12 @@ for ($i = 0; $i < count($names); $i++) {
     $menu_image = NULL;
     if (isset($_FILES['image']['name'][$i]) && $_FILES['image']['error'][$i] === UPLOAD_ERR_OK) {
         $tmpName = $_FILES['image']['tmp_name'][$i];
-        $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($_FILES['image']['name'][$i]));
-        $fileName = time() . "_" . $safeName;
+        $ext = strtolower(pathinfo($_FILES['image']['name'][$i], PATHINFO_EXTENSION));
+        $ext = $ext !== '' ? $ext : 'jpg';
+        $fileName = uniqid('menu_', true) . '.' . $ext;
         $targetPath = $uploadDir . $fileName;
 
-        if (move_uploaded_file($tmpName, $targetPath)) {
+        if (tlm_store_uploaded_with_compression($tmpName, $targetPath)) {
             $menu_image = 'uploads/menus/' . $fileName;
         }
     }

@@ -11,8 +11,9 @@ require  'PHPMailer/src/Exception.php';
 require  'PHPMailer/src/PHPMailer.php';
 require  'PHPMailer/src/SMTP.php';
 
-$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0; 
+$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 require_once 'db_con.php';
+require_once 'upload_utils.php';
 
 // Initialize SweetAlert variables
 $swal_trigger = false;
@@ -63,7 +64,7 @@ if (!$user_id) {
                 mkdir($targetDir, 0777, true);
             }
             $targetFile = $targetDir . $uniqueName;
-            if (move_uploaded_file($_FILES[$field]['tmp_name'], $targetFile)) {
+            if (tlm_store_uploaded_with_compression($_FILES[$field]['tmp_name'], $targetFile)) {
                 $filePaths[$field] = 'uploads/requirements/new/' . $folderName . '/' . $field . '/' . $uniqueName;
             } else {
                 $filePaths[$field] = '';
@@ -326,7 +327,7 @@ if (!$user_id) {
                 mkdir($targetDir_renewal, 0777, true);
             }
             $targetFile_renewal = $targetDir_renewal . $uniqueName_renewal;
-            if (move_uploaded_file($_FILES[$field_renewal]['tmp_name'], $targetFile_renewal)) {
+            if (tlm_store_uploaded_with_compression($_FILES[$field_renewal]['tmp_name'], $targetFile_renewal)) {
                 $filePaths_renewal[$field_renewal] = 'uploads/requirements/renewal/' . $folderlName_renewal . '/' . $field_renewal . '/' . $uniqueName_renewal;
             } else {
                 $filePaths_renewal[$field_renewal] = '';

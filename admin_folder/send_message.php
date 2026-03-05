@@ -1,7 +1,9 @@
 <?php
 // /admin_folder/send_message.php
+// Log errors but don't display them to avoid breaking JSON
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 session_start();
 require_once '../db_con.php';

@@ -1,5 +1,6 @@
 <?php
 include '../db_con.php';
+require_once '../upload_utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fbowner_id = intval($_POST['fbowner_id'] ?? 0);
@@ -29,19 +30,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 🔹 Handle photo upload
     $photoPath = null;
     if (!empty($_FILES['photo']['name'])) {
-        $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
+        $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+        $ext = $ext !== '' ? $ext : 'jpg';
         $photoName = "photo_" . time() . "_" . uniqid() . "." . $ext;
-        $photoPath = "review_uploads/" . $photoName; // relative path for DB
-        move_uploaded_file($_FILES['photo']['tmp_name'], $uploadDir . $photoName);
+        if (tlm_store_uploaded_with_compression($_FILES['photo']['tmp_name'], $uploadDir . $photoName)) {
+            $photoPath = "review_uploads/" . $photoName; // relative path for DB
+        }
     }
 
     // 🔹 Handle video upload
     $videoPath = null;
     if (!empty($_FILES['video']['name'])) {
-        $ext = pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION);
+        $ext = strtolower(pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION));
+        $ext = $ext !== '' ? $ext : 'mp4';
         $videoName = "video_" . time() . "_" . uniqid() . "." . $ext;
-        $videoPath = "review_uploads/" . $videoName; // relative path for DB
-        move_uploaded_file($_FILES['video']['tmp_name'], $uploadDir . $videoName);
+        if (tlm_move_uploaded_fallback($_FILES['video']['tmp_name'], $uploadDir . $videoName)) {
+            $videoPath = "review_uploads/" . $videoName; // relative path for DB
+        }
     }
 
     // 🔹 Insert into DB

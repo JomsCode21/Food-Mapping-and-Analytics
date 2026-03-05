@@ -1,5 +1,6 @@
 <?php
 require_once '../db_con.php';
+require_once '../upload_utils.php';
 session_start();
 
 $fbowner_id = isset($_POST['fbowner_id']) ? intval($_POST['fbowner_id']) : 0;
@@ -23,21 +24,27 @@ if ($user_id) {
 // Handle photo upload
 $photo_path = null;
 if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-    $photo_name = uniqid('review_photo_', true) . '.' . pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
+    $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+    $ext = $ext !== '' ? $ext : 'jpg';
+    $photo_name = uniqid('review_photo_', true) . '.' . $ext;
     $photo_dir = '../uploads/review_photos/';
     if (!is_dir($photo_dir)) mkdir($photo_dir, 0777, true);
-    move_uploaded_file($_FILES['photo']['tmp_name'], $photo_dir . $photo_name);
-    $photo_path = 'uploads/review_photos/' . $photo_name;
+    if (tlm_store_uploaded_with_compression($_FILES['photo']['tmp_name'], $photo_dir . $photo_name)) {
+        $photo_path = 'uploads/review_photos/' . $photo_name;
+    }
 }
 
 // Handle video upload
 $video_path = null;
 if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
-    $video_name = uniqid('review_video_', true) . '.' . pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION);
+    $ext = strtolower(pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION));
+    $ext = $ext !== '' ? $ext : 'mp4';
+    $video_name = uniqid('review_video_', true) . '.' . $ext;
     $video_dir = '../uploads/review_videos/';
     if (!is_dir($video_dir)) mkdir($video_dir, 0777, true);
-    move_uploaded_file($_FILES['video']['tmp_name'], $video_dir . $video_name);
-    $video_path = 'uploads/review_videos/' . $video_name;
+    if (tlm_move_uploaded_fallback($_FILES['video']['tmp_name'], $video_dir . $video_name)) {
+        $video_path = 'uploads/review_videos/' . $video_name;
+    }
 }
 
 // Insert review into database

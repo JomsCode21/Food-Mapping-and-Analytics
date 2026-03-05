@@ -1,5 +1,6 @@
 <?php
 include '../db_con.php';
+require_once '../upload_utils.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -9,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $comment   = trim($_POST['comment'] ?? '');
 
     if ($review_id <= 0 || $user_id <= 0) {
-        echo json_encode(['status'=>'error','msg'=>'Invalid request']);
+        echo json_encode(['status' => 'error', 'msg' => 'Invalid request']);
         exit();
     }
 
@@ -22,27 +23,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     if ($ownerId != $user_id) {
-        echo json_encode(['status'=>'error','msg'=>'Unauthorized']);
+        echo json_encode(['status' => 'error', 'msg' => 'Unauthorized']);
         exit();
     }
 
-    // Handle photo upload
+    // Handle photo upload with compression.
     $photoPath = $oldPhoto;
+    $photoReplaced = false;
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-        $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-        $photoName = 'uploads/photos/' . uniqid() . '.' . $ext;
-        if (move_uploaded_file($_FILES['photo']['tmp_name'], "../$photoName")) {
+        $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+        $ext = $ext !== '' ? $ext : 'jpg';
+        $photoName = 'uploads/photos/' . uniqid('review_photo_', true) . '.' . $ext;
+        if (tlm_store_uploaded_with_compression($_FILES['photo']['tmp_name'], "../$photoName")) {
             $photoPath = $photoName;
+            $photoReplaced = true;
         }
     }
 
-    // Handle video upload
+    // Handle video upload.
     $videoPath = $oldVideo;
+    $videoReplaced = false;
     if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
-        $ext = pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION);
-        $videoName = 'uploads/videos/' . uniqid() . '.' . $ext;
-        if (move_uploaded_file($_FILES['video']['tmp_name'], "../$videoName")) {
+        $ext = strtolower(pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION));
+        $ext = $ext !== '' ? $ext : 'mp4';
+        $videoName = 'uploads/videos/' . uniqid('review_video_', true) . '.' . $ext;
+        if (tlm_move_uploaded_fallback($_FILES['video']['tmp_name'], "../$videoName")) {
             $videoPath = $videoName;
+            $videoReplaced = true;
         }
     }
 
@@ -51,12 +58,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $update->bind_param("isssi", $rating, $comment, $photoPath, $videoPath, $review_id);
 
     if ($update->execute()) {
+        if ($photoReplaced && !empty($oldPhoto) && tlm_normalize_stored_path($oldPhoto) !== tlm_normalize_stored_path($photoPath)) {
+            tlm_delete_storage_file($oldPhoto, dirname(__DIR__));
+        }
+        if ($videoReplaced && !empty($oldVideo) && tlm_normalize_stored_path($oldVideo) !== tlm_normalize_stored_path($videoPath)) {
+            tlm_delete_storage_file($oldVideo, dirname(__DIR__));
+        }
+
         // Add cache-busting query string
         $photoUrl = $photoPath ? $photoPath . '?v=' . time() : '';
         $videoUrl = $videoPath ? $videoPath . '?v=' . time() : '';
-        echo json_encode(['status'=>'success','photo'=>$photoUrl,'video'=>$videoUrl]);
+        echo json_encode(['status' => 'success', 'photo' => $photoUrl, 'video' => $videoUrl]);
     } else {
-        echo json_encode(['status'=>'error','msg'=>'Failed to update review']);
+        echo json_encode(['status' => 'error', 'msg' => 'Failed to update review']);
     }
     $update->close();
 }

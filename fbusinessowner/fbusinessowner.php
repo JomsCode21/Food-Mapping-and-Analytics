@@ -2,6 +2,7 @@
 session_start();
 require_once '../db_con.php'; // Make sure this sets $conn as MySQLi
 require_once '../status_logic.php';
+require_once '../upload_utils.php';
 
 $maps_api_key = env_value('GOOGLE_MAPS_API_KEY', '');
 
@@ -57,50 +58,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['fb_longitude'])) { $fields[] = 'fb_longitude = ?'; $params[] = $_POST['fb_longitude']; $types .= 's'; }
     if (isset($_POST['business_address'])) { $fields[] = 'fb_address = ?'; $params[] = $_POST['business_address']; $types .= 's'; }
 
+    $old_business_photo_path = $row['fb_photo'] ?? '';
+    $old_cover_photo_path = $row['fb_cover'] ?? '';
+    $business_photo_path = $old_business_photo_path;
+    $cover_photo_path = $old_cover_photo_path;
+    $business_photo_replaced = false;
+    $cover_photo_replaced = false;
+
     // Handle Business Photo Upload
     if (!empty($_FILES['business_photo']['name'])) {
-        $business_photo = $_FILES['business_photo']['name'];
-        $business_photo_tmp = $_FILES['business_photo']['tmp_name'];
-        $business_folder = isset($_POST['business_name']) ? preg_replace('/[^A-Za-z0-9_\-]/', '_', $_POST['business_name']) : 'default';
+        $business_folder_source = isset($_POST['business_name']) ? $_POST['business_name'] : ($row['fb_name'] ?? 'default');
+        $business_folder = preg_replace('/[^A-Za-z0-9_\-]/', '_', $business_folder_source);
+        if ($business_folder === '') {
+            $business_folder = 'default';
+        }
+
         $upload_dir = '../uploads/business_photo/' . $business_folder . '/';
-        if (!is_dir($upload_dir)) { mkdir($upload_dir, 0777, true); }
-        $business_photo_path = $upload_dir . uniqid() . '_' . basename($business_photo);
-        move_uploaded_file($business_photo_tmp, $business_photo_path);
-    } else {
-        $business_photo_path = isset($_POST['existing_business_photo']) ? $_POST['existing_business_photo'] : '';
+        $ext = strtolower(pathinfo($_FILES['business_photo']['name'], PATHINFO_EXTENSION));
+        $ext = $ext !== '' ? $ext : 'jpg';
+        $filename = uniqid('logo_', true) . '.' . $ext;
+        $relative_path = 'uploads/business_photo/' . $business_folder . '/' . $filename;
+        $target_path = $upload_dir . $filename;
+
+        if (tlm_store_uploaded_with_compression($_FILES['business_photo']['tmp_name'], $target_path)) {
+            $business_photo_path = $relative_path;
+            $business_photo_replaced = true;
+            $fields[] = 'fb_photo = ?';
+            $params[] = $business_photo_path;
+            $types .= 's';
+        }
     }
-    if (!empty($_FILES['business_photo']['name'])) { $fields[] = 'fb_photo = ?'; $params[] = $business_photo_path; $types .= 's'; }
 
     // Handle Cover Photo Upload
     if (!empty($_FILES['fb_cover']['name'])) {
-        $cover_photo = $_FILES['fb_cover']['name'];
-        $cover_photo_tmp = $_FILES['fb_cover']['tmp_name'];
-        $business_folder = isset($_POST['business_name']) ? preg_replace('/[^A-Za-z0-9_\-]/', '_', $_POST['business_name']) : 'default';
+        $business_folder_source = isset($_POST['business_name']) ? $_POST['business_name'] : ($row['fb_name'] ?? 'default');
+        $business_folder = preg_replace('/[^A-Za-z0-9_\-]/', '_', $business_folder_source);
+        if ($business_folder === '') {
+            $business_folder = 'default';
+        }
+
         $upload_dir = '../uploads/business_cover/' . $business_folder . '/';
-        if (!is_dir($upload_dir)) { mkdir($upload_dir, 0777, true); }
-        $cover_photo_path = $upload_dir . uniqid() . '_' . basename($cover_photo);
-        move_uploaded_file($cover_photo_tmp, $cover_photo_path);
-    } else {
-        $cover_photo_path = isset($_POST['existing_fb_cover']) ? $_POST['existing_fb_cover'] : '';
+        $ext = strtolower(pathinfo($_FILES['fb_cover']['name'], PATHINFO_EXTENSION));
+        $ext = $ext !== '' ? $ext : 'jpg';
+        $filename = uniqid('cover_', true) . '.' . $ext;
+        $relative_path = 'uploads/business_cover/' . $business_folder . '/' . $filename;
+        $target_path = $upload_dir . $filename;
+
+        if (tlm_store_uploaded_with_compression($_FILES['fb_cover']['tmp_name'], $target_path)) {
+            $cover_photo_path = $relative_path;
+            $cover_photo_replaced = true;
+            $fields[] = 'fb_cover = ?';
+            $params[] = $cover_photo_path;
+            $types .= 's';
+        }
     }
-    if (!empty($_FILES['fb_cover']['name'])) { $fields[] = 'fb_cover = ?'; $params[] = $cover_photo_path; $types .= 's'; }
 
     // Handle Gallery Uploads
     $gallery_paths = [];
     if (isset($_FILES['business_gallery']['name']) && is_array($_FILES['business_gallery']['name']) && !empty(array_filter($_FILES['business_gallery']['name']))) {
-        $business_folder = isset($_POST['business_name']) ? preg_replace('/[^A-Za-z0-9_\-]/', '_', $_POST['business_name']) : 'default';
+        $business_folder_source = isset($_POST['business_name']) ? $_POST['business_name'] : ($row['fb_name'] ?? 'default');
+        $business_folder = preg_replace('/[^A-Za-z0-9_\-]/', '_', $business_folder_source);
+        if ($business_folder === '') {
+            $business_folder = 'default';
+        }
+
         $upload_dir = '../uploads/business_gallery/' . $business_folder . '/';
-        if (!is_dir($upload_dir)) { mkdir($upload_dir, 0777, true); }
         foreach ($_FILES['business_gallery']['name'] as $key => $business_images) {
-            $business_images_tmp = $_FILES['business_gallery']['tmp_name'][$key];
-            $business_images_filename = uniqid() . '_' . basename($business_images);
-            $business_images_path = $upload_dir . $business_images_filename;
-            if (move_uploaded_file($business_images_tmp, $business_images_path)) {
-                $relative_path = 'uploads/business_gallery/' . $business_folder . '/' . $business_images_filename;
+            if ($_FILES['business_gallery']['error'][$key] !== UPLOAD_ERR_OK) {
+                continue;
+            }
+
+            $ext = strtolower(pathinfo($business_images, PATHINFO_EXTENSION));
+            $ext = $ext !== '' ? $ext : 'jpg';
+            $filename = uniqid('gallery_', true) . '.' . $ext;
+            $relative_path = 'uploads/business_gallery/' . $business_folder . '/' . $filename;
+            $target_path = $upload_dir . $filename;
+
+            if (tlm_store_uploaded_with_compression($_FILES['business_gallery']['tmp_name'][$key], $target_path)) {
                 $gallery_paths[] = $relative_path;
             }
         }
     }
+
     // Merge Gallery
     $stmt_latest = $conn->prepare("SELECT fb_gallery FROM fb_owner WHERE user_id = ?");
     $stmt_latest->bind_param("i", $user_id);
@@ -110,10 +149,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $existing_gallery = [];
     if ($row_latest && !empty($row_latest['fb_gallery'])) {
         $existing_gallery = json_decode($row_latest['fb_gallery'], true);
-        if (!is_array($existing_gallery)) $existing_gallery = [];
+        if (!is_array($existing_gallery)) {
+            $existing_gallery = [];
+        }
     }
     $all_gallery = array_merge($existing_gallery, $gallery_paths);
-    if (!empty($all_gallery)) { $fields[] = 'fb_gallery = ?'; $params[] = json_encode($all_gallery); $types .= 's'; }
+    if (!empty($all_gallery)) {
+        $fields[] = 'fb_gallery = ?';
+        $params[] = json_encode($all_gallery);
+        $types .= 's';
+    }
 
     // Handle Menu Image Uploads
     $menu_image_paths = [];
@@ -123,41 +168,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($raw_name) && isset($row['fb_name'])) {
             $raw_name = $row['fb_name'];
         }
-        
+
         $business_folder = preg_replace('/[^A-Za-z0-9_\-]/', '_', $raw_name);
-        
+
         if (empty($business_folder)) {
             $business_folder = 'default';
         }
 
         $upload_dir = '../uploads/menu_images/' . $business_folder . '/';
-        if (!is_dir($upload_dir)) { mkdir($upload_dir, 0777, true); }
-        
+
         foreach ($_FILES['menu_images']['name'] as $key => $img_name) {
-            // Check for upload errors
             if ($_FILES['menu_images']['error'][$key] !== UPLOAD_ERR_OK) {
                 continue;
             }
 
-            $tmp_name = $_FILES['menu_images']['tmp_name'][$key];
-            $filename = uniqid() . '_' . basename($img_name);
-            $path = $upload_dir . $filename;
-            
-            if (move_uploaded_file($tmp_name, $path)) {
-                // Save correct relative path
-                $menu_image_paths[] = ['path' => 'uploads/menu_images/' . $business_folder . '/' . $filename, 'hidden' => 0];
+            $ext = strtolower(pathinfo($img_name, PATHINFO_EXTENSION));
+            $ext = $ext !== '' ? $ext : 'jpg';
+            $filename = uniqid('menu_gallery_', true) . '.' . $ext;
+            $relative_path = 'uploads/menu_images/' . $business_folder . '/' . $filename;
+            $target_path = $upload_dir . $filename;
+
+            if (tlm_store_uploaded_with_compression($_FILES['menu_images']['tmp_name'][$key], $target_path)) {
+                $menu_image_paths[] = ['path' => $relative_path, 'hidden' => 0];
             }
         }
     }
+
     // Stack new menu images
     $existing_menu_images = [];
     if (isset($row['menu_images']) && !empty($row['menu_images'])) {
         $existing_menu_images = json_decode($row['menu_images'], true);
-        if (!is_array($existing_menu_images)) $existing_menu_images = [];
-        foreach ($existing_menu_images as &$img) { if (is_string($img)) $img = ['path' => $img, 'hidden' => 0]; }
+        if (!is_array($existing_menu_images)) {
+            $existing_menu_images = [];
+        }
+        foreach ($existing_menu_images as &$img) {
+            if (is_string($img)) {
+                $img = ['path' => $img, 'hidden' => 0];
+            }
+        }
     }
+
     $all_menu_images = array_merge($existing_menu_images, $menu_image_paths);
-    if (!empty($all_menu_images)) { $fields[] = 'menu_images = ?'; $params[] = json_encode($all_menu_images); $types .= 's'; }
+    if (!empty($all_menu_images)) {
+        $fields[] = 'menu_images = ?';
+        $params[] = json_encode($all_menu_images);
+        $types .= 's';
+    }
 
     // Check for existing record
     $stmt_checking = $conn->prepare("SELECT 1 FROM fb_owner WHERE user_id = ?");
@@ -174,8 +230,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_update->bind_param($types, ...$params);
             
             if ($stmt_update->execute()) {
-                $_SESSION['swal_success'] = 'Details saved successfully.'; 
-                header("Location: " . $_SERVER['REQUEST_URI']); 
+                if ($business_photo_replaced && !empty($old_business_photo_path) && tlm_normalize_stored_path($old_business_photo_path) !== tlm_normalize_stored_path($business_photo_path)) {
+                    tlm_delete_storage_file($old_business_photo_path, dirname(__DIR__));
+                }
+                if ($cover_photo_replaced && !empty($old_cover_photo_path) && tlm_normalize_stored_path($old_cover_photo_path) !== tlm_normalize_stored_path($cover_photo_path)) {
+                    tlm_delete_storage_file($old_cover_photo_path, dirname(__DIR__));
+                }
+
+                $_SESSION['swal_success'] = 'Details saved successfully.';
+                header("Location: " . $_SERVER['REQUEST_URI']);
                 exit();
             }
             $stmt_update->close();
@@ -193,26 +256,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'lat' => $_POST['fb_latitude'] ?? '0',
             'long' => $_POST['fb_longitude'] ?? '0'
         ];
-        $json_gallery_str = isset($all_gallery) ? json_encode($all_gallery) : '[]';
-        $json_menu_images_str = isset($all_menu_images) ? json_encode($all_menu_images) : '[]';
-        
+        $json_gallery = isset($all_gallery) ? json_encode($all_gallery) : '[]';
+        $json_menu_images = isset($all_menu_images) ? json_encode($all_menu_images) : '[]';
+
         $stmt_insert = $conn->prepare("INSERT INTO fb_owner (user_id, fb_name, fb_type, fb_description, fb_phone_number, fb_email_address, fb_operating_hours, fb_address, fb_photo, fb_cover, fb_latitude, fb_longitude, fb_gallery, menu_images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        
-        $stmt_insert->bind_param("isssssssssssss", 
-            $user_id, 
-            $defaults['name'], 
-            $defaults['type'], 
-            $defaults['desc'], 
-            $defaults['phone'], 
-            $defaults['email'], 
-            $defaults['hours'], 
-            $defaults['addr'], 
-            $business_photo_path, 
-            $cover_photo_path, 
-            $defaults['lat'], 
+
+        $stmt_insert->bind_param("isssssssssssss",
+            $user_id,
+            $defaults['name'],
+            $defaults['type'],
+            $defaults['desc'],
+            $defaults['phone'],
+            $defaults['email'],
+            $defaults['hours'],
+            $defaults['addr'],
+            $business_photo_path,
+            $cover_photo_path,
+            $defaults['lat'],
             $defaults['long'],
-            $json_gallery,     
-            $json_menu_images 
+            $json_gallery,
+            $json_menu_images
         );
         
         if($stmt_insert->execute()) {
