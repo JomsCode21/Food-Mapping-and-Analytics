@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
   exit;
 }
 
-# hello word for commit
 $menu_id = intval($_POST['menu_id']);
 
 $oldImage = null;
