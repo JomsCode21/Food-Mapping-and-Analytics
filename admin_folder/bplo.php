@@ -110,7 +110,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"/>
+    <link rel="stylesheet" href="../vendors/css/theme-toggle.css"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      (function () {
+        var savedTheme = null;
+        try {
+          savedTheme = localStorage.getItem('tlm-theme');
+        } catch (e) {}
+
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+        if (theme === 'dark') {
+          document.documentElement.classList.add('theme-dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('theme-dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
     <style>
       body { font-family: "Inter", sans-serif; }
     </style>
@@ -122,19 +142,30 @@
         <h1 class="font-['Pacifico'] text-3xl text-black-600">
           Taste<span class="text-red-500">Libmanan</span>
         </h1>
-        <div class="relative">
-          <button id="profiling-btn" class="text-gray-600 hover:text-blue-600 transition p-2 rounded-full hover:bg-gray-100">
-            <i class="ri-admin-line text-2xl"></i>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            data-theme-toggle
+            class="theme-toggle-btn inline-flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode"
+          >
+            <i data-theme-icon class="ri-moon-line text-lg"></i>
           </button>
-          <div id="admin-menu"
-               class="hidden absolute right-0 top-full mt-2 w-48 bg-white shadow-xl rounded-xl py-2 z-50 border border-gray-100 transform origin-top-right transition-all duration-200">
-            <a href="admin_account.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                <i class="ri-user-settings-line mr-2"></i> Account
-            </a>
-            <div class="border-t border-gray-100 my-1"></div>
-            <a href="../index.php" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                <i class="ri-logout-box-line mr-2"></i> Logout
-            </a>
+          <div class="relative">
+            <button id="profiling-btn" class="text-gray-600 hover:text-blue-600 transition p-2 rounded-full hover:bg-gray-100">
+              <i class="ri-admin-line text-2xl"></i>
+            </button>
+            <div id="admin-menu"
+                 class="hidden absolute right-0 top-full mt-2 w-48 bg-white shadow-xl rounded-xl py-2 z-50 border border-gray-100 transform origin-top-right transition-all duration-200">
+              <a href="admin_account.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+                  <i class="ri-user-settings-line mr-2"></i> Account
+              </a>
+              <div class="border-t border-gray-100 my-1"></div>
+              <a href="../index.php" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                  <i class="ri-logout-box-line mr-2"></i> Logout
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -168,8 +199,8 @@
             <li class="mb-2 w-full">
               <a href="bplo.php"
                 id="admin-dashboard"
-                class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3
-                <?php echo ($current_page == 'bplo.php') ? 'bg-blue-100 font-bold' : 'hover:bg-blue-100'; ?>">
+                class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3
+                <?php echo ($current_page == 'bplo.php') ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-100 font-bold' : 'hover:bg-blue-100 dark:hover:bg-blue-900/30'; ?>">
                 <span class="inline-block w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
                 <i class="ri-dashboard-line text-xl"></i>
                 <span class="ml-2">Dashboard</span>
@@ -177,26 +208,26 @@
             </li>
         
             <li class="relative group">
-              <a href="javascript:void(0);" onclick="toggleDropdown()" class="flex items-center px-5 py-4 rounded-xl transition text-base font-medium w-full justify-between <?php echo ($current_page == 'business_request.php') ? 'bg-green-100 font-bold' : 'hover:bg-green-100'; ?>">
+              <a href="javascript:void(0);" onclick="toggleDropdown()" class="flex items-center px-5 py-4 rounded-xl transition text-base font-medium text-gray-700 dark:text-gray-200 w-full justify-between <?php echo ($current_page == 'business_request.php') ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-100 font-bold' : 'hover:bg-green-100 dark:hover:bg-green-900/30'; ?>">
             
                 <div class="flex items-center">
                   <span class="inline-block w-2.5 h-10 bg-green-500 rounded-full mr-4"></span>
                   <i class="ri-file-text-line text-xl mr-4"></i>
                   <span>Requests</span>
                 </div>
-                <i class="ri-arrow-down-s-line text-gray-400 text-xl"></i>
+                <i class="ri-arrow-down-s-line text-gray-400 dark:text-gray-300 text-xl"></i>
               </a>
               <ul id="registration-dropdown" class="hidden pl-14 mt-1 space-y-1">
-                <li><a href="business_request.php?type=new" class="block px-4 py-3 text-base text-gray-500 hover:text-black-600 rounded-lg hover:bg-green-100"><i class="ri-file-text-line text-xl mr-4"></i>New</a></li>
-                <li><a href="business_request.php?type=renewal" class="block px-4 py-3 text-base text-gray-500 hover:text-black-600 rounded-lg hover:bg-green-100"><i class="ri-refresh-line text-xl mr-4"></i>Renewal</a></li>
+                <li><a href="business_request.php?type=new" class="block px-4 py-3 text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30"><i class="ri-file-text-line text-xl mr-4"></i>New</a></li>
+                <li><a href="business_request.php?type=renewal" class="block px-4 py-3 text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30"><i class="ri-refresh-line text-xl mr-4"></i>Renewal</a></li>
               </ul>
             </li>
         
             <li class="mb-2 w-full">
               <a href="business_management.php"
                 id="admin-business-management"
-                class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3
-                <?php echo ($current_page == 'business_management.php') ? 'bg-yellow-100 font-bold' : 'hover:bg-yellow-100'; ?>">
+                class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3
+                <?php echo ($current_page == 'business_management.php') ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-100 font-bold' : 'hover:bg-yellow-100 dark:hover:bg-yellow-900/30'; ?>">
                 <span class="inline-block w-2 h-8 bg-yellow-500 rounded-full mr-3"></span>
                 <i class="ri-store-2-line text-xl"></i>
                 <span class="ml-2">Business Management</span>
@@ -206,8 +237,8 @@
             <li class="mb-2 w-full">
               <a href="user_information.php"
                 id="admin-user-information"
-                class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3
-                <?php echo ($current_page == 'user_information.php') ? 'bg-orange-100 font-bold' : 'hover:bg-orange-100'; ?>">
+                class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3
+                <?php echo ($current_page == 'user_information.php') ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-100 font-bold' : 'hover:bg-orange-100 dark:hover:bg-orange-900/30'; ?>">
                 <span class="inline-block w-2 h-8 bg-orange-500 rounded-full mr-3"></span>
                 <i class="ri-user-line text-xl"></i>
                 <span class="ml-2">User Information</span>
@@ -215,7 +246,7 @@
             </li>
         
             <li class="mb-2 w-full">
-              <a href="notification.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3 hover:bg-red-100">
+              <a href="notification.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3 hover:bg-red-100 dark:hover:bg-red-900/30">
                 <span class="inline-block w-2 h-8 bg-red-500 rounded-full mr-3"></span>
                 <i class="ri-notification-line text-xl"></i>
                 <span class="ml-2">Notifications</span>
@@ -226,8 +257,8 @@
             <li class="w-full">
                 <a href="chat_with_business_owner.php"
                     id="toggle-chat-btn" 
-                    class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3 relative
-                    <?php echo($current_page == 'chat_with_business_owner.php') ? 'bg-pink-100 font-bold' : 'hover:bg-pink-100'; ?>">
+                    class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3 relative
+                    <?php echo($current_page == 'chat_with_business_owner.php') ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-100 font-bold' : 'hover:bg-pink-100 dark:hover:bg-pink-900/30'; ?>">
 
                     <span class="inline-block w-2 h-8 bg-pink-500 rounded-full mr-3"></span>
                     <i class="ri-chat-1-line text-xl"></i>
@@ -344,6 +375,7 @@
       </div>
     </div>
 
+    <script src="../vendors/js/theme-toggle.js"></script>
     <script>
       // --- Menu Scripts ---
       const profilingBtn = document.getElementById('profiling-btn');

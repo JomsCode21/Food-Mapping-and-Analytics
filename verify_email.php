@@ -9,6 +9,8 @@ require_once 'db_con.php';
     <title>Email Verification - Libmanan Food</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+
+    <link rel='stylesheet' href='vendors/css/theme-toggle.css'/>
 </head>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen">
 
@@ -85,5 +87,7 @@ if (isset($_GET['code'])) {
 }
 ?>
 
+
+  <script src='vendors/js/theme-toggle.js'></script>
 </body>
 </html>

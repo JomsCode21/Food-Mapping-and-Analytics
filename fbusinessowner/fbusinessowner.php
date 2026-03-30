@@ -298,12 +298,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.0.0/remixicon.min.css">
+    <link rel="stylesheet" href="../vendors/css/theme-toggle.css"/>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function () {
+            var savedTheme = null;
+            try {
+                savedTheme = localStorage.getItem('tlm-theme');
+            } catch (e) {}
+
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+            if (theme === 'dark') {
+                document.documentElement.classList.add('theme-dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('theme-dark');
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
     
     <script>
         tailwind.config = {
@@ -355,6 +375,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button id="publicProfileLink" class="text-gray-500 hover:text-primary transition flex items-center gap-2 text-sm font-medium">
                         <i class="ri-eye-line text-lg"></i> View Public Page
                     </button>
+
+                    <button
+                        type="button"
+                        data-theme-toggle
+                        class="theme-toggle-btn inline-flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
+                        aria-label="Toggle dark mode"
+                        title="Toggle dark mode"
+                    >
+                        <i data-theme-icon class="ri-moon-line text-lg"></i>
+                    </button>
                     
                     <button id="settingsLink" class="text-gray-500 hover:text-primary transition">
                         <i class="ri-settings-3-line text-xl"></i>
@@ -380,6 +410,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div id="topIcons" class="hidden sm:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg">
             <div class="px-4 py-3 space-y-3">
+                <button
+                    type="button"
+                    data-theme-toggle
+                    class="theme-toggle-btn w-full text-left text-gray-600 hover:text-primary py-2"
+                    aria-label="Toggle dark mode"
+                    title="Toggle dark mode"
+                >
+                    <i data-theme-icon class="ri-moon-line mr-2"></i> Toggle Theme
+                </button>
                 <a href="#" id="publicProfileLinkMobile" class="block text-gray-600 hover:text-primary py-2"><i class="ri-user-line mr-2"></i> View Profile</a>
                 <a href="#" id="settingsLinkMobile" class="block text-gray-600 hover:text-primary py-2"><i class="ri-settings-3-line mr-2"></i> Settings</a>
                 <a href="../logout.php" class="block text-red-600 py-2"><i class="ri-logout-box-line mr-2"></i> Logout</a>
@@ -922,6 +961,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
 
+    <script src="../vendors/js/theme-toggle.js"></script>
     <script>
         // For Auto_Uploading business photo and cover_photo
         document.addEventListener('DOMContentLoaded', () => {
@@ -1085,6 +1125,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         setInterval(checkRealTimeStatus, 10000);
 
         // --- Google Maps Logic ---
+        const OWNER_MAP_STYLES_LIGHT = [
+            { featureType: "poi", stylers: [{ visibility: "off" }] }
+        ];
+
+        const OWNER_MAP_STYLES_DARK = [
+            { elementType: "geometry", stylers: [{ color: "#1f2937" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#cbd5e1" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#111827" }] },
+            { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#374151" }] },
+            { featureType: "poi", elementType: "geometry", stylers: [{ color: "#111827" }] },
+            { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+            { featureType: "road", elementType: "geometry", stylers: [{ color: "#334155" }] },
+            { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#1f2937" }] },
+            { featureType: "transit", elementType: "geometry", stylers: [{ color: "#0f172a" }] },
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#0b1220" }] }
+        ];
+
+        function isOwnerMapDarkTheme() {
+            return document.documentElement.classList.contains('theme-dark') ||
+                   document.documentElement.getAttribute('data-theme') === 'dark';
+        }
+
+        function getOwnerMapStyles() {
+            return isOwnerMapDarkTheme() ? OWNER_MAP_STYLES_DARK : OWNER_MAP_STYLES_LIGHT;
+        }
+
         function initBusinessMap() {
             var existingLat = document.getElementById('latitude').value;
             var existingLng = document.getElementById('longitude').value;
@@ -1096,7 +1162,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             var map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 15, center: myLatlng, mapTypeId: google.maps.MapTypeId.ROADMAP,
                 disableDefaultUI: false,
-                styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }]
+                styles: getOwnerMapStyles()
+            });
+
+            const root = document.documentElement;
+            const mapThemeObserver = new MutationObserver(() => {
+                map.setOptions({ styles: getOwnerMapStyles() });
+            });
+            mapThemeObserver.observe(root, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+
+            document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    setTimeout(() => {
+                        map.setOptions({ styles: getOwnerMapStyles() });
+                    }, 0);
+                });
             });
 
             var marker = new google.maps.Marker({ position: myLatlng, map: map, draggable: true, title: "Drag to location" });

@@ -76,6 +76,7 @@ if (!empty($fav_ids)) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
       tailwind.config = {
+                darkMode: 'class',
         theme: {
           extend: {
             colors: { primary: "#A80000", secondary: "#FF6B00", dark: "#1F2937", light: "#F3F4F6" },
@@ -91,60 +92,97 @@ if (!empty($fav_ids)) {
         },
       }
     </script>
+        <script>
+            (function () {
+                var savedTheme = null;
+                try {
+                    savedTheme = localStorage.getItem('tlm-theme');
+                } catch (e) {}
+
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('theme-dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('theme-dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            })();
+        </script>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
-</head>
-<body class="bg-gray-50 font-['Inter'] flex flex-col min-h-screen">
 
-    <nav class="bg-white shadow-sm border-b border-gray-100">
+    <link rel='stylesheet' href='../vendors/css/theme-toggle.css'/>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-['Inter'] flex flex-col min-h-screen transition-colors">
+
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <a href="user.php" class="font-['Pacifico'] text-2xl text-primary">TasteLibmanan</a>
-                <a href="user.php" class="text-gray-600 hover:text-primary font-medium">← Back to Home</a>
+                <a href="user.php" class="font-brand text-3xl text-primary hover:text-red-700 transition">
+                    Taste<span class="text-gray-800 dark:text-white">Libmanan</span>
+                </a>
+                <div class="flex items-center gap-3">
+                    <a href="user.php" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-primary transition-colors font-medium">
+                        <i class="ri-arrow-left-line"></i>
+                        Back to Home
+                    </a>
+                    <button
+                        type="button"
+                        data-theme-toggle
+                        class="theme-toggle-btn inline-flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                        aria-label="Toggle dark mode"
+                        title="Toggle dark mode"
+                    >
+                        <i data-theme-icon class="ri-moon-line text-lg"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 py-10 flex-grow w-full">
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-gray-200 pb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-gray-200 dark:border-gray-700 pb-6">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">My Favorites ❤️</h1>
-                <p class="text-gray-500">Your curated list of must-visit food spots.</p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">My Favorites ❤️</h1>
+                <p class="text-gray-500 dark:text-gray-400">Your curated list of must-visit food spots.</p>
             </div>
             
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <div class="relative w-full sm:w-64">
                     <input type="text" id="searchInput" oninput="clientSideSearch()" placeholder="Search favorites..." 
-                           class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary shadow-sm">
-                    <i class="ri-search-line absolute left-3 top-3 text-gray-400"></i>
+                              class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary shadow-sm">
+                          <i class="ri-search-line absolute left-3 top-3 text-gray-400 dark:text-gray-500"></i>
                 </div>
 
                 <div class="relative w-full sm:w-48">
                     <select id="priceRangeDropdown" onchange="applyPriceFilter()" 
-                            class="w-full pl-3 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm cursor-pointer">
+                            class="w-full pl-3 pr-10 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm cursor-pointer">
                         <option value="all">All Prices</option>
                         <option value="below100">Below ₱100</option>
                         <option value="100to200">₱100 – ₱200</option>
                         <option value="above200">Above ₱200</option>
                     </select>
-                    <i class="ri-arrow-down-s-line absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                    <i class="ri-arrow-down-s-line absolute right-3 top-3 text-gray-400 dark:text-gray-500 pointer-events-none"></i>
                 </div>
             </div>
         </div>
 
         <?php if (empty($fav_businesses)): ?>
-            <div class="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
-                <i class="ri-heart-add-line text-6xl text-gray-300 mb-4 inline-block"></i>
-                <h3 class="text-xl font-medium text-gray-900">No favorites yet</h3>
-                <p class="text-gray-500 mt-2">Go back and explore to save businesses here!</p>
+            <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 transition-colors">
+                <i class="ri-heart-add-line text-6xl text-gray-300 dark:text-gray-500 mb-4 inline-block"></i>
+                <h3 class="text-xl font-medium text-gray-900 dark:text-white">No favorites yet</h3>
+                <p class="text-gray-500 dark:text-gray-400 mt-2">Go back and explore to save businesses here!</p>
                 <a href="categories.php" class="mt-4 inline-block px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-800 transition">Explore Now</a>
             </div>
         <?php else: ?>
             <div id="favorites-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <?php foreach ($fav_businesses as $biz): ?>
                     <div onclick="location.href='businessdetails.php?fbowner_id=<?php echo $biz['fbowner_id']; ?>'" 
-                         class="fav-card bg-white rounded-2xl shadow-soft hover:shadow-card overflow-hidden transition-all duration-300 flex flex-col h-full border border-gray-100 relative cursor-pointer group"
+                         class="fav-card bg-white dark:bg-gray-800 rounded-2xl shadow-soft hover:shadow-card overflow-hidden transition-all duration-300 flex flex-col h-full border border-gray-100 dark:border-gray-700 relative cursor-pointer group"
                          data-name="<?= strtolower(html_entity_decode($biz['fb_name'])) ?>"
                          data-min-price="<?= $biz['min_price']; ?>"
                          data-max-price="<?= $biz['max_price']; ?>">
@@ -155,7 +193,7 @@ if (!empty($fav_ids)) {
                                  onerror="this.src='../vendors/imgsource/default.jpg'">
                                  
                             <button onclick="event.stopPropagation(); removeFavorite(this, <?php echo $biz['fbowner_id']; ?>)" 
-                                    class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full text-red-600 flex items-center justify-center shadow-md hover:bg-red-50 z-10 transition-transform hover:scale-110" 
+                                    class="absolute top-3 right-3 w-8 h-8 bg-white dark:bg-gray-700 rounded-full text-red-600 dark:text-red-400 flex items-center justify-center shadow-md hover:bg-red-50 dark:hover:bg-red-900/20 z-10 transition-transform hover:scale-110" 
                                     title="Remove from favorites">
                                 <i class="ri-delete-bin-line"></i>
                             </button>
@@ -172,7 +210,7 @@ if (!empty($fav_ids)) {
                         </div>
                         
                         <div class="p-5 flex flex-col flex-grow">
-                            <h3 class="text-lg font-bold text-gray-900 mb-1 truncate group-hover:text-primary transition">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1 truncate group-hover:text-primary transition">
                                 <?php echo html_entity_decode($biz['fb_name']); ?>
                             </h3>
                             
@@ -187,10 +225,10 @@ if (!empty($fav_ids)) {
                                         }
                                     ?>
                                 </div>
-                                <span class="text-[12px] text-gray-500 ml-1.5 font-medium">(<?= $biz['total_reviews'] ?> reviews)</span>
+                                <span class="text-[12px] text-gray-500 dark:text-gray-400 ml-1.5 font-medium">(<?= $biz['total_reviews'] ?> reviews)</span>
                             </div>
 
-                            <p class="text-xs text-gray-500 mb-3 flex items-center truncate">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 flex items-center truncate">
                                 <i class="ri-map-pin-line mr-1"></i> <?php echo htmlspecialchars($biz['fb_address']); ?>
                             </p>
 
@@ -202,7 +240,7 @@ if (!empty($fav_ids)) {
                                 <?php endif; ?>
                             </p>
                             
-                            <div class="block w-full text-center py-2.5 rounded-xl bg-gray-50 text-gray-700 font-semibold text-sm group-hover:bg-primary group-hover:text-white transition-colors border border-gray-100 mt-auto">
+                            <div class="block w-full text-center py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold text-sm group-hover:bg-primary group-hover:text-white transition-colors border border-gray-100 dark:border-gray-600 mt-auto">
                                 View Details
                             </div>
                         </div>
@@ -211,16 +249,16 @@ if (!empty($fav_ids)) {
             </div>
             
             <div id="noResultsMsg" class="hidden flex-col items-center justify-center py-12 text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                    <i class="ri-search-2-line text-3xl text-gray-400"></i>
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
+                    <i class="ri-search-2-line text-3xl text-gray-400 dark:text-gray-500"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-700">No favorites found</h3>
-                <p class="text-gray-500">Try adjusting your search or filter.</p>
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200">No favorites found</h3>
+                <p class="text-gray-500 dark:text-gray-400">Try adjusting your search or filter.</p>
             </div>
         <?php endif; ?>
     </div>
 
-    <footer class="bg-primary text-white py-10 mt-12 border-t border-red-800">
+    <footer class="bg-primary dark:bg-gray-900 text-white py-10 mt-12 border-t border-red-800 dark:border-gray-800 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
             <h1 class="font-brand text-3xl mb-6">TasteLibmanan</h1>
             <nav class="flex flex-wrap justify-center gap-6 mb-6 text-sm font-medium">
@@ -233,10 +271,10 @@ if (!empty($fav_ids)) {
     </footer>
 
     <div id="aboutModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-2xl p-8 max-w-4xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button onclick="document.getElementById('aboutModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors z-10"><i class="ri-close-line text-3xl"></i></button>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-4xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="document.getElementById('aboutModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors z-10"><i class="ri-close-line text-3xl"></i></button>
             <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">About Us</h2>
-            <div class="text-sm sm:text-base text-gray-700 leading-relaxed space-y-4">
+            <div class="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed space-y-4">
                 <p><strong>About the Business Permits and Licensing Office (BPLO)</strong><br>
                 • The Business Permits and Licensing Office (BPLO) is the official arm of the Local Government Unit (LGU) responsible for overseeing the regulation, registration, and monitoring of all businesses operating within the municipality. Its primary mandate is to ensure that enterprises comply with national and local laws, ordinances, and standards to promote fair, safe, and legal business practices.</p>
                 
@@ -265,12 +303,12 @@ if (!empty($fav_ids)) {
     </div>
     
     <div id="contactModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button onclick="document.getElementById('contactModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors"><i class="ri-close-line text-3xl"></i></button>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="document.getElementById('contactModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"><i class="ri-close-line text-3xl"></i></button>
             <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">Contact Us</h2>
-            <div class="space-y-6 text-gray-700">
+            <div class="space-y-6 text-gray-700 dark:text-gray-300">
                 <p class="text-center text-base">We'd love to hear from you! Reach out to us through any of the following channels:</p>
-                <div class="bg-gray-50 p-6 rounded-xl space-y-4 border border-gray-100">
+                <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl space-y-4 border border-gray-100 dark:border-gray-600">
                     <p class="flex items-center"><i class="ri-map-pin-line mr-3 text-primary text-xl"></i> <span><strong>Address:</strong> Municipal Hall, Libmanan, Camarines Sur, Philippines</span></p>
                     <p class="flex items-center"><i class="ri-phone-line mr-3 text-primary text-xl"></i> <span><strong>Phone:</strong> (054) 123-4567</span></p>
                     <p class="flex items-center"><i class="ri-mail-line mr-3 text-primary text-xl"></i> <span><strong>Email:</strong> tastelibmanan@gmail.com</span></p>
@@ -281,11 +319,11 @@ if (!empty($fav_ids)) {
     </div>
 
     <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-2xl p-8 max-w-3xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button onclick="document.getElementById('privacyModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors"><i class="ri-close-line text-3xl"></i></button>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-3xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="document.getElementById('privacyModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"><i class="ri-close-line text-3xl"></i></button>
             <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">Privacy Policy</h2>
-            <div class="text-sm sm:text-base text-gray-700 leading-relaxed space-y-4">
-                <p class="text-center text-gray-500 text-xs uppercase tracking-widest mb-4">Last Updated: October 2, 2025</p>
+            <div class="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed space-y-4">
+                <p class="text-center text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mb-4">Last Updated: October 2, 2025</p>
                 <div class="space-y-4">
                     <p><strong>1. Introduction</strong><br>The BPLO System respects your privacy and is committed to protecting the personal information you provide. This Privacy Policy explains how we collect, use, and safeguard your information.</p>
                     
@@ -373,9 +411,20 @@ if (!empty($fav_ids)) {
             }
         }
 
+        function getSwalThemeOptions() {
+            const isDark = document.documentElement.classList.contains('theme-dark') ||
+                           document.documentElement.getAttribute('data-theme') === 'dark';
+
+            return {
+                background: isDark ? '#1f2937' : '#ffffff',
+                color: isDark ? '#e5e7eb' : '#111827'
+            };
+        }
+
         // --- REMOVE FAVORITE LOGIC (with SweetAlert) ---
         function removeFavorite(btn, id) {
             Swal.fire({
+                ...getSwalThemeOptions(),
                 title: 'Remove from Favorites?',
                 text: "Are you sure you want to remove this business?",
                 icon: 'warning',
@@ -395,6 +444,7 @@ if (!empty($fav_ids)) {
                     .then(data => {
                         if(data.status === 'success') {
                             Swal.fire({
+                                ...getSwalThemeOptions(),
                                 title: 'Removed!',
                                 text: 'The business has been removed from your list.',
                                 icon: 'success',
@@ -420,16 +470,30 @@ if (!empty($fav_ids)) {
                                 }, 300);
                             });
                         } else {
-                            Swal.fire('Error!', "Error removing favorite: " + (data.message || "Unknown"), 'error');
+                            Swal.fire({
+                                ...getSwalThemeOptions(),
+                                title: 'Error!',
+                                text: "Error removing favorite: " + (data.message || "Unknown"),
+                                icon: 'error',
+                                confirmButtonColor: '#A80000'
+                            });
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        Swal.fire('Error', "Server communication error.", 'error');
+                        Swal.fire({
+                            ...getSwalThemeOptions(),
+                            title: 'Error',
+                            text: 'Server communication error.',
+                            icon: 'error',
+                            confirmButtonColor: '#A80000'
+                        });
                     });
                 }
             });
         }
     </script>
+
+  <script src='../vendors/js/theme-toggle.js'></script>
 </body>
 </html>

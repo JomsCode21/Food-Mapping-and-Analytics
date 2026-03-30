@@ -43,6 +43,8 @@
         }
         .btn:hover { background: #8a0000; }
     </style>
+
+    <link rel='stylesheet' href='../vendors/css/theme-toggle.css'/>
 </head>
 <body>
     <h1>🔍 Tastelibmanan Database Diagnostics</h1>
@@ -151,5 +153,7 @@
         </ul>
     </div>
     
+
+  <script src='../vendors/js/theme-toggle.js'></script>
 </body>
 </html>

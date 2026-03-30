@@ -54,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Multi File Upload</title>
+
+    <link rel='stylesheet' href='../../vendors/css/theme-toggle.css'/>
 </head>
 <body>
     <h2>Upload Multiple Files</h2>
@@ -87,5 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "</ul>";
     }
     ?>
+
+  <script src='../../vendors/js/theme-toggle.js'></script>
 </body>
 </html>

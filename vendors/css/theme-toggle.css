@@ -1,0 +1,170 @@
+html,
+body {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.theme-toggle-btn {
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-floating {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle-floating:hover {
+  background: #e5e7eb;
+}
+
+.theme-toggle-floating [data-theme-glyph] {
+  font-size: 18px;
+  line-height: 1;
+}
+
+html.theme-dark {
+  color-scheme: dark;
+}
+
+html.theme-dark body {
+  background-color: #0f172a !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .bg-white,
+html.theme-dark .bg-white\/90,
+html.theme-dark .bg-white\/80,
+html.theme-dark .bg-gray-50,
+html.theme-dark .bg-gray-100,
+html.theme-dark .glass-nav,
+html.theme-dark .modal-content,
+html.theme-dark .card-shadow {
+  background-color: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .bg-red-50,
+html.theme-dark .bg-orange-50,
+html.theme-dark .bg-blue-50,
+html.theme-dark .bg-green-50,
+html.theme-dark .bg-yellow-50 {
+  background-color: #1f2937 !important;
+}
+
+html.theme-dark .text-gray-900,
+html.theme-dark .text-gray-800,
+html.theme-dark .text-gray-700,
+html.theme-dark .text-gray-600,
+html.theme-dark .text-gray-500,
+html.theme-dark .text-black-600 {
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+html.theme-dark .border-gray-50,
+html.theme-dark .border-gray-100,
+html.theme-dark .border-gray-200,
+html.theme-dark .border-gray-300 {
+  border-color: #374151 !important;
+}
+
+html.theme-dark .shadow-sm,
+html.theme-dark .shadow-md,
+html.theme-dark .shadow-lg,
+html.theme-dark .shadow-xl,
+html.theme-dark .shadow-2xl,
+html.theme-dark .card-shadow,
+html.theme-dark .shadow-card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.theme-dark input,
+html.theme-dark select,
+html.theme-dark textarea {
+  background-color: #0b1220 !important;
+  border-color: #334155 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .hover\:bg-gray-50:hover,
+html.theme-dark .hover\:bg-gray-100:hover,
+html.theme-dark .hover\:bg-red-50:hover,
+html.theme-dark .hover\:bg-green-100:hover,
+html.theme-dark .hover\:bg-yellow-100:hover,
+html.theme-dark .hover\:bg-blue-100:hover,
+html.theme-dark .hover\:bg-orange-100:hover {
+  background-color: #1f2937 !important;
+}
+
+html.theme-dark ::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+html.theme-dark .notification,
+html.theme-dark #topIcons,
+html.theme-dark #mobile-menu,
+html.theme-dark #admin-menu {
+  background-color: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .hero-section {
+  background: linear-gradient(135deg, #0b1220, #111827, #1f2937) !important;
+}
+
+html.theme-dark #RatingsSection .bg-gradient-to-br.from-red-50.to-white {
+  background-image: none !important;
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+}
+
+html.theme-dark #RatingsSection #summaryText {
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark #RatingsSection #summaryTag {
+  color: #fca5a5 !important;
+}
+
+html.theme-dark #RatingsSection #summaryLoader span {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark #RatingsSection .summary-filter-btn {
+  background-color: #0f172a !important;
+  border-color: #475569 !important;
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark #RatingsSection .summary-filter-btn:hover {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark #RatingsSection .summary-filter-btn.bg-red-600 {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .theme-toggle-floating {
+  border-color: #475569;
+  background: #1f2937;
+  color: #e5e7eb;
+}

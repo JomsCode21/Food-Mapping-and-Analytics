@@ -14,6 +14,15 @@ if ($fbowner_id <= 0) {
     exit;
 }
 
+function safe_ai_unavailable_message($providerMessage = '') {
+    $msg = strtolower((string)$providerMessage);
+    if (strpos($msg, 'api key') !== false || strpos($msg, 'leak') !== false || strpos($msg, 'permission') !== false || strpos($msg, 'unauth') !== false || strpos($msg, 'invalid') !== false) {
+        return 'AI summary is temporarily unavailable. Please contact the administrator.';
+    }
+
+    return 'AI summary is currently unavailable. Please try again later.';
+}
+
 // FOLDER SETUP
 $cache_dir = "summary_cache/"; 
 if (!is_dir($cache_dir)) {
@@ -94,7 +103,7 @@ if ($current_count > 0 && $needs_update) {
         $apiKey = env_value('GEMINI_API_KEY', '');
 
         if ($apiKey === '') {
-            $cached_summary = 'AI summary unavailable. Missing API key.';
+            $cached_summary = 'AI summary is temporarily unavailable. Please contact the administrator.';
         } else {
             $apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $apiKey;
 
@@ -142,12 +151,14 @@ if ($current_count > 0 && $needs_update) {
                 }
                 // ERROR HANDLING
                 if (isset($result['error']['message'])) {
-                    $cached_summary = "Gemini Error: " . $result['error']['message'];
+                    error_log('Gemini API error in fetch_summary_logic.php: ' . $result['error']['message']);
+                    $cached_summary = safe_ai_unavailable_message($result['error']['message']);
                 } else {
-                    $cached_summary = "AI Summary unavailable. Recent feedback: " . substr($reviews_text, 0, 300) . "...";
+                    $cached_summary = safe_ai_unavailable_message('unknown provider error');
                 }
             } else {
-                $cached_summary = "Connection Error: " . $curl_error;
+                error_log('Gemini connection error in fetch_summary_logic.php: ' . $curl_error);
+                $cached_summary = 'AI summary is currently unavailable. Please try again later.';
             }
         }
     } else {

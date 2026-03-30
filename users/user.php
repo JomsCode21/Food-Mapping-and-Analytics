@@ -90,6 +90,7 @@ $conn->close();
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: { 
@@ -117,8 +118,28 @@ $conn->close();
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+        <link rel="stylesheet" href="../vendors/css/theme-toggle.css"/>
     <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo htmlspecialchars($maps_api_key, ENT_QUOTES, 'UTF-8'); ?>"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+        <script>
+            (function () {
+                var savedTheme = null;
+                try {
+                    savedTheme = localStorage.getItem('tlm-theme');
+                } catch (e) {}
+
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('theme-dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('theme-dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            })();
+        </script>
 
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -135,12 +156,17 @@ $conn->close();
           max-height: 250px;
           overflow-y: auto;
         }
+
+                html.theme-dark .group:hover .visit-page-btn {
+                    background-color: #b91c1c !important;
+                    color: #ffffff !important;
+                }
     </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors">
     
-    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 transition-all duration-300">
+    <nav class="sticky top-0 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-700 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex-shrink-0 flex items-center">
@@ -155,19 +181,29 @@ $conn->close();
                     <a href="../FBregistration.php" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-800 transition shadow-sm flex items-center">
                         <i class="ri-store-3-line mr-1"></i> Register Business
                     </a>
+
+                    <button
+                        type="button"
+                        data-theme-toggle
+                        class="theme-toggle-btn inline-flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        aria-label="Toggle dark mode"
+                        title="Toggle dark mode"
+                    >
+                        <i data-theme-icon class="ri-moon-line text-lg"></i>
+                    </button>
                     
                     <div class="relative group">
                          <button class="flex items-center space-x-2 text-gray-600 hover:text-primary transition focus:outline-none">
                             <span class="font-medium text-sm">Account</span>
                             <i class="ri-arrow-down-s-line"></i>
                         </button>
-                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-card border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                            <a href="#" onclick="openModal()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-primary"><i class="ri-settings-3-line mr-2"></i>Settings</a>
-                            <a href="favorites.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-primary">
+                        <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-card border border-gray-100 dark:border-gray-700 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                            <a href="#" onclick="openModal()" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-gray-700 hover:text-primary"><i class="ri-settings-3-line mr-2"></i>Settings</a>
+                            <a href="favorites.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-gray-700 hover:text-primary">
                                 <i class="ri-heart-line mr-2"></i>My Favorites
                             </a>
-                            <div class="border-t border-gray-100 my-1"></div>
-                            <a href="../logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="ri-logout-box-r-line mr-2"></i>Logout</a>
+                            <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                            <a href="../logout.php" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"><i class="ri-logout-box-r-line mr-2"></i>Logout</a>
                         </div>
                     </div>
                 </div>
@@ -180,12 +216,21 @@ $conn->close();
             </div>
         </div>
 
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 transition-colors">
             <div class="px-4 pt-2 pb-4 space-y-1">
                 <a href="user.php" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary">Home</a>
                 <a href="../fbusinessowner/categories.php" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Businesses</a>     
                 <a href="favorites.php" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">My Favorites</a>
                 <a href="../FBregistration.php" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Register Business</a>  
+                <button
+                    type="button"
+                    data-theme-toggle
+                    class="theme-toggle-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    aria-label="Toggle dark mode"
+                    title="Toggle dark mode"
+                >
+                    <i data-theme-icon class="ri-moon-line mr-2"></i>Toggle Theme
+                </button>
                 <a href="#" onclick="openModal()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Account Settings</a>
                 <a href="../logout.php" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50">Logout</a>
             </div>
@@ -193,33 +238,33 @@ $conn->close();
     </nav>
 
     <div id="accountModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-[60] transition-opacity">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative transform scale-100 transition-transform">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-8 relative transform scale-100 transition-transform">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Account Settings</h2>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="ri-close-line text-2xl"></i></button>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Account Settings</h2>
+                <button onclick="closeModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition"><i class="ri-close-line text-2xl"></i></button>
             </div>
             <form id="accountForm" method="POST" action="update_account.php">
                 <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
                 
                 <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">Email Address</label>
+                    <label class="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Email Address</label>
                     <div class="relative">
-                        <i class="ri-mail-line absolute left-3 top-3 text-gray-400"></i>
-                        <input type="email" name="email" value="<?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?>" class="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" required>
+                        <i class="ri-mail-line absolute left-3 top-3 text-gray-400 dark:text-gray-500"></i>
+                        <input type="email" name="email" value="<?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?>" class="w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" required>
                     </div>
                 </div>
                 
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">New Password</label>
+                    <label class="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">New Password</label>
                     <div class="relative">
-                        <i class="ri-lock-line absolute left-3 top-3 text-gray-400"></i>
-                        <input type="password" name="password" placeholder="••••••••" class="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" minlength="8" maxlength="16">
+                        <i class="ri-lock-line absolute left-3 top-3 text-gray-400 dark:text-gray-500"></i>
+                        <input type="password" name="password" placeholder="••••••••" class="w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" minlength="8" maxlength="16">
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Leave blank to keep current password.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave blank to keep current password.</p>
                 </div>
                 
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition">Cancel</button>
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition">Cancel</button>
                     <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-primary hover:bg-red-800 rounded-lg shadow-md transition">Save Changes</button>
                 </div>
             </form>
@@ -227,12 +272,12 @@ $conn->close();
     </div>
 
     <div id="aboutModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-2xl p-8 max-w-4xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button id="closeAboutModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors z-10">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-4xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button id="closeAboutModal" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors z-10">
                 <i class="ri-close-line text-3xl"></i>
             </button>
             <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">About Us</h2>
-            <div class="text-sm sm:text-base text-gray-700 leading-relaxed space-y-4">
+            <div class="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed space-y-4">
                 <p><strong>About the Business Permits and Licensing Office (BPLO)</strong><br>
                 • The Business Permits and Licensing Office (BPLO) is the official arm of the Local Government Unit (LGU) responsible for overseeing the regulation, registration, and monitoring of all businesses operating within the municipality. Its primary mandate is to ensure that enterprises comply with national and local laws, ordinances, and standards to promote fair, safe, and legal business practices.</p>
                 
@@ -261,14 +306,14 @@ $conn->close();
     </div>
 
     <div id="contactModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button id="closeContactModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button id="closeContactModal" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                 <i class="ri-close-line text-3xl"></i>
             </button>
             <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">Contact Us</h2>
-            <div class="space-y-6 text-gray-700">
+            <div class="space-y-6 text-gray-700 dark:text-gray-300">
                 <p class="text-center text-base">We'd love to hear from you! Reach out to us through any of the following channels:</p>
-                <div class="bg-gray-50 p-6 rounded-xl space-y-4 border border-gray-100">
+                <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl space-y-4 border border-gray-100 dark:border-gray-600">
                     <p class="flex items-center"><i class="ri-map-pin-line mr-3 text-primary text-xl"></i> <span><strong>Address:</strong> Municipal Hall, Libmanan, Camarines Sur, Philippines</span></p>
                     <p class="flex items-center"><i class="ri-phone-line mr-3 text-primary text-xl"></i> <span><strong>Phone:</strong> (054) 123-4567</span></p>
                     <p class="flex items-center"><i class="ri-mail-line mr-3 text-primary text-xl"></i> <span><strong>Email:</strong> tastelibmanan@gmail.com</span></p>
@@ -279,12 +324,12 @@ $conn->close();
     </div>
 
     <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-2xl p-8 max-w-3xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button id="closePrivacyModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-3xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button id="closePrivacyModal" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                 <i class="ri-close-line text-3xl"></i>
             </button>
             <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">Privacy Policy</h2>
-            <div class="text-sm sm:text-base text-gray-700 leading-relaxed space-y-4">
+            <div class="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed space-y-4">
                 <p class="text-center text-gray-500 text-xs uppercase tracking-widest mb-4">Last Updated: October 2, 2025</p>
                 <div class="space-y-4">
                     <p><strong>1. Introduction</strong><br>The BPLO System respects your privacy and is committed to protecting the personal information you provide. This Privacy Policy explains how we collect, use, and safeguard your information.</p>
@@ -323,18 +368,18 @@ $conn->close();
             <div class="max-w-2xl mx-auto relative">
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="ri-search-line text-gray-400 text-xl group-focus-within:text-primary transition"></i>
+                        <i class="ri-search-line text-gray-400 dark:text-gray-500 text-xl group-focus-within:text-primary transition"></i>
                     </div>
                     <input type="text" id="searchBusinessInput" 
-                        class="block w-full pl-12 pr-12 py-4 bg-white border-0 rounded-full shadow-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-red-500/30 transition-shadow text-lg" 
+                        class="block w-full pl-12 pr-12 py-4 bg-white dark:bg-gray-800 border-0 rounded-full shadow-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-red-500/30 transition-shadow text-lg" 
                         placeholder="Search for food businesses..." autocomplete="off">
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <button id="startScanner" class="p-2 text-gray-400 hover:text-primary transition rounded-full hover:bg-red-50" title="Scan QR Code">
+                        <button id="startScanner" class="p-2 text-gray-400 dark:text-gray-500 hover:text-primary transition rounded-full hover:bg-red-50 dark:hover:bg-gray-700" title="Scan QR Code">
                             <i class="ri-qr-scan-2-line text-xl"></i>
                         </button>
                     </div>
                 </div>
-                <div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white rounded-xl shadow-2xl mt-2 overflow-hidden hidden border border-gray-100 divide-y divide-gray-100"></div>
+                <div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 rounded-xl shadow-2xl mt-2 overflow-hidden hidden border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700"></div>
             </div>
             
             <div id="qr-reader" class="mt-4 mx-auto bg-white p-2 rounded-lg hidden shadow-lg relative max-w-sm"></div>
@@ -356,28 +401,28 @@ $conn->close();
                 ['name' => 'Bakeries', 'img' => '../vendors/imgsource/bakeries.jpg', 'link' => 'bakery']
             ];
             foreach($cats as $cat): ?>
-            <a href="../fbusinessowner/categories.php?cat=<?= $cat['link'] ?>" class="group bg-white rounded-xl shadow-md p-4 flex items-center space-x-4 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-100 group-hover:border-primary transition">
+            <a href="../fbusinessowner/categories.php?cat=<?= $cat['link'] ?>" class="group bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex items-center space-x-4 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-100 dark:border-gray-700 group-hover:border-primary transition">
                     <img src="<?= $cat['img'] ?>" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h3 class="font-bold text-gray-800 group-hover:text-primary transition"><?= $cat['name'] ?></h3>
-                    <p class="text-xs text-gray-500">View All →</p>
+                    <h3 class="font-bold text-gray-800 dark:text-white group-hover:text-primary transition"><?= $cat['name'] ?></h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">View All →</p>
                 </div>
             </a>
             <?php endforeach; ?>
         </div>
 
-        <section class="bg-white rounded-2xl shadow-card overflow-hidden mb-12 border border-gray-100">
-            <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-card overflow-hidden mb-12 border border-gray-100 dark:border-gray-700">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center">
                         <i class="ri-map-pin-user-fill text-primary mr-2"></i> Food Map
                     </h2>
-                    <p class="text-sm text-gray-500">Discover what's nearby</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Discover what's nearby</p>
                 </div>
                 <div class="relative w-full sm:w-48">
-                    <select id="cuisineTypeDropdown" class="w-full pl-3 pr-10 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition cursor-pointer appearance-none">
+                    <select id="cuisineTypeDropdown" class="w-full pl-3 pr-10 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-700 transition cursor-pointer appearance-none">
                         <option value="">All Categories</option>
                         <option value="1">✨ Newly Opened</option>
                         <option value="Restaurant">Restaurants</option>
@@ -394,8 +439,8 @@ $conn->close();
 
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h2 class="text-2xl font-bold text-gray-900">Top Rated Spots</h2>
-                <p class="text-gray-500 text-sm">Based on local visits and reviews</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Top Rated Spots</h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Based on local visits and reviews</p>
             </div>
             <a href="../fbusinessowner/categories.php" class="text-primary font-medium hover:text-red-700 text-sm flex items-center">
                 View All <i class="ri-arrow-right-line ml-1"></i>
@@ -415,7 +460,7 @@ $conn->close();
                 } 
             ?>
                 <div onclick="location.href='businessdetails.php?fbowner_id=<?php echo $row['fbowner_id']; ?>'" 
-                     class="group bg-white rounded-2xl shadow-soft hover:shadow-card overflow-hidden transition-all duration-300 flex flex-col h-full border border-gray-100 relative cursor-pointer">
+                     class="group bg-white dark:bg-gray-800 rounded-2xl shadow-soft hover:shadow-card overflow-hidden transition-all duration-300 flex flex-col h-full border border-gray-100 dark:border-gray-700 relative cursor-pointer">
                     
                     <div class="relative h-48 overflow-hidden">
                         <img src="<?php echo $display_photo ?>" 
@@ -450,7 +495,7 @@ $conn->close();
                     </div>
                     
                     <div class="p-5 flex flex-col flex-grow">
-                        <h3 class="text-lg font-bold text-gray-900 mb-1 group-hover:text-primary transition truncate">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-primary transition truncate">
                             <?php echo html_entity_decode($row['fb_name']); ?>
                         </h3>
                         
@@ -468,11 +513,11 @@ $conn->close();
                             <span class="text-xs text-gray-500 ml-2 font-medium">(<?= $row['total_reviews'] ?> reviews)</span>
                         </div>
                         
-                        <p class="text-gray-500 text-sm line-clamp-2 mb-4 flex-grow">
+                        <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-grow">
                             <?php echo htmlspecialchars($row['fb_description'] ?: 'No description available.'); ?>
                         </p>
                         
-                        <div class="block w-full text-center py-2.5 rounded-xl bg-gray-50 text-gray-700 font-semibold text-sm group-hover:bg-primary group-hover:text-white transition-colors">
+                        <div class="visit-page-btn block w-full text-center py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold text-sm group-hover:bg-red-700 dark:group-hover:bg-red-700 group-hover:text-white transition-colors">
                             Visit Page
                         </div>
                     </div>
@@ -482,7 +527,7 @@ $conn->close();
 
     </main>
 
-    <footer class="bg-primary text-white py-10 mt-12 border-t border-red-800">
+    <footer class="bg-primary dark:bg-gray-900 text-white py-10 mt-12 border-t border-red-800 dark:border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
             
             <h1 class="font-brand text-3xl mb-6">TasteLibmanan</h1>
@@ -607,6 +652,75 @@ $conn->close();
         let allMarkers = [];
         let map;
         let infoWindow;
+        let libmananPolygon;
+
+        const MAP_STYLES_LIGHT = [
+            { featureType: "all", elementType: "labels", stylers: [{ visibility: "off" }] },
+            { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#334155" }] },
+            { featureType: "administrative", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#ffffff" }, { weight: 2 }] },
+            { featureType: "administrative.locality", elementType: "labels", stylers: [{ visibility: "on" }] },
+            { featureType: "administrative.neighborhood", elementType: "labels", stylers: [{ visibility: "on" }] },
+            { featureType: "administrative.land_parcel", elementType: "labels", stylers: [{ visibility: "on" }] },
+            { featureType: "road", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#475569" }] },
+            { featureType: "road", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#ffffff" }, { weight: 2 }] },
+            { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
+        ];
+
+        const MAP_STYLES_DARK = [
+            { featureType: "all", elementType: "labels", stylers: [{ visibility: "off" }] },
+            { elementType: "geometry", stylers: [{ color: "#1f2937" }] },
+            { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#374151" }] },
+            { featureType: "poi", elementType: "geometry", stylers: [{ color: "#111827" }] },
+            { featureType: "road", elementType: "geometry", stylers: [{ color: "#334155" }] },
+            { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#1f2937" }] },
+            { featureType: "transit", elementType: "geometry", stylers: [{ color: "#0f172a" }] },
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#0b1220" }] },
+            { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#cbd5e1" }] },
+            { featureType: "administrative", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#111827" }, { weight: 2 }] },
+            { featureType: "administrative.locality", elementType: "labels", stylers: [{ visibility: "on" }] },
+            { featureType: "administrative.neighborhood", elementType: "labels", stylers: [{ visibility: "on" }] },
+            { featureType: "administrative.land_parcel", elementType: "labels", stylers: [{ visibility: "on" }] },
+            { featureType: "road", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#94a3b8" }] },
+            { featureType: "road", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#0f172a" }, { weight: 2 }] },
+            { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
+        ];
+
+        function isDarkThemeActive() {
+            return document.documentElement.classList.contains('theme-dark') ||
+                   document.documentElement.getAttribute('data-theme') === 'dark';
+        }
+
+        function getMapStylesForTheme() {
+            return isDarkThemeActive() ? MAP_STYLES_DARK : MAP_STYLES_LIGHT;
+        }
+
+        function updateMapTheme() {
+            if (!map) return;
+
+            map.setOptions({ styles: getMapStylesForTheme() });
+
+            if (libmananPolygon) {
+                libmananPolygon.setOptions({
+                    strokeColor: isDarkThemeActive() ? "#f87171" : "#A80000"
+                });
+            }
+        }
+
+        function bindMapThemeUpdates() {
+            const root = document.documentElement;
+
+            const observer = new MutationObserver(() => {
+                updateMapTheme();
+            });
+
+            observer.observe(root, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+
+            document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    setTimeout(updateMapTheme, 0);
+                });
+            });
+        }
 
         function generateInfoContent(biz) {
             const statusColor = biz.fb_status.toLowerCase() === 'open' ? 'text-green-600' : 'text-red-600';
@@ -637,24 +751,118 @@ $conn->close();
             }, 100);
         }
 
+        function statusRingColor(status) {
+            return String(status).toLowerCase().trim() === 'open' ? '#22c55e' : '#ef4444';
+        }
+
+        function buildFallbackCircleIcon(status) {
+            const size = 46;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            const center = size / 2;
+            const radius = center - 3;
+
+            ctx.beginPath();
+            ctx.arc(center, center, radius + 1, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#e5e7eb';
+            ctx.fill();
+
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = statusRingColor(status);
+            ctx.stroke();
+
+            return {
+                url: canvas.toDataURL('image/png'),
+                scaledSize: new google.maps.Size(46, 46),
+                anchor: new google.maps.Point(23, 23)
+            };
+        }
+
+        function buildPhotoCircleIcon(photoUrl, status, onReady, onError) {
+            const size = 46;
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+
+            img.onload = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+
+                    const center = size / 2;
+                    const radius = center - 3;
+
+                    ctx.beginPath();
+                    ctx.arc(center, center, radius + 1, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fill();
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(center, center, radius - 1, 0, Math.PI * 2);
+                    ctx.clip();
+
+                    const ratio = Math.max(size / img.width, size / img.height);
+                    const drawW = img.width * ratio;
+                    const drawH = img.height * ratio;
+                    const dx = (size - drawW) / 2;
+                    const dy = (size - drawH) / 2;
+                    ctx.drawImage(img, dx, dy, drawW, drawH);
+                    ctx.restore();
+
+                    ctx.beginPath();
+                    ctx.arc(center, center, radius, 0, Math.PI * 2);
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = statusRingColor(status);
+                    ctx.stroke();
+
+                    onReady({
+                        url: canvas.toDataURL('image/png'),
+                        scaledSize: new google.maps.Size(46, 46),
+                        anchor: new google.maps.Point(23, 23)
+                    });
+                } catch (e) {
+                    onError();
+                }
+            };
+
+            img.onerror = onError;
+            img.src = photoUrl;
+        }
+
         function renderMarkers(filteredBusinesses, map, infoWindow) {
             allMarkers.forEach(marker => marker.setMap(null));
             allMarkers = [];
-
-            const iconSize = new google.maps.Size(32, 42);
             
             filteredBusinesses.forEach(biz => {
-                let iconUrl = biz.fb_status && String(biz.fb_status).toLowerCase().trim() === 'open' 
-                    ? "../vendors/icon/Green_map_pointer.png" 
-                    : "../vendors/icon/Red_map_pointer.png";
+                const hasPhoto = typeof biz.fb_photo === 'string' && biz.fb_photo.trim() !== '';
+                const fallbackIcon = buildFallbackCircleIcon(biz.fb_status);
 
                 const marker = new google.maps.Marker({
                     position: { lat: parseFloat(biz.fb_latitude), lng: parseFloat(biz.fb_longitude) },
                     map: map,
                     title: biz.fb_name,
-                    icon: { url: iconUrl, scaledSize: iconSize },
+                    icon: fallbackIcon,
                     animation: google.maps.Animation.DROP
                 });
+
+                if (hasPhoto) {
+                    buildPhotoCircleIcon(
+                        biz.fb_photo,
+                        biz.fb_status,
+                        (icon) => marker.setIcon(icon),
+                        () => marker.setIcon(fallbackIcon)
+                    );
+                }
                 
                 marker.set('biz_id', biz.fbowner_id);
                 allMarkers.push(marker);
@@ -688,14 +896,19 @@ $conn->close();
                                 const marker = allMarkers.find(m => m.get('biz_id') == biz.fbowner_id);
                             
                                 if (marker) {
-                                    const iconUrl = newStatus === 'open' 
-                                        ? "../vendors/icon/Green_map_pointer.png" 
-                                        : "../vendors/icon/Red_map_pointer.png";
-                                
-                                    marker.setIcon({
-                                        url: iconUrl,
-                                        scaledSize: new google.maps.Size(32, 42)
-                                    });
+                                    const hasPhoto = typeof biz.fb_photo === 'string' && biz.fb_photo.trim() !== '';
+                                    const fallbackIcon = buildFallbackCircleIcon(newStatus);
+
+                                    if (hasPhoto) {
+                                        buildPhotoCircleIcon(
+                                            biz.fb_photo,
+                                            newStatus,
+                                            (icon) => marker.setIcon(icon),
+                                            () => marker.setIcon(fallbackIcon)
+                                        );
+                                    } else {
+                                        marker.setIcon(fallbackIcon);
+                                    }
                                 
                                     if (infoWindow.getMap() && infoWindow.getPosition().equals(marker.getPosition())) {
                                         infoWindow.setContent(generateInfoContent(biz));
@@ -785,12 +998,12 @@ $conn->close();
                 disableDefaultUI: false,
                 mapTypeControl: true,
                 streetViewControl: false,
-                styles: [{ featureType: "all", elementType: "labels", stylers: [{ visibility: "off" }] }]
+                styles: getMapStylesForTheme()
             });
 
-            const libmananPolygon = new google.maps.Polygon({
+            libmananPolygon = new google.maps.Polygon({
                 paths: libmananCoords,
-                strokeColor: "#A80000",
+                strokeColor: isDarkThemeActive() ? "#f87171" : "#A80000",
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
                 fillColor: "transparent",
@@ -872,9 +1085,11 @@ $conn->close();
             });
 
             startLiveStatusUpdates();
+            bindMapThemeUpdates();
         }
         
         window.onload = initMap;
     </script>
+    <script src="../vendors/js/theme-toggle.js"></script>
 </body>
 </html>

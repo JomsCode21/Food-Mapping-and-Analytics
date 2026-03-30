@@ -92,6 +92,7 @@ if ($user_id && !$isPublicView) {
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+                darkMode: 'class',
         theme: {
           extend: {
             colors: { 
@@ -129,9 +130,11 @@ if ($user_id && !$isPublicView) {
         .tab-content { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+
+    <link rel='stylesheet' href='../vendors/css/theme-toggle.css'/>
 </head>
 
-<body class="text-gray-800">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors">
 
 <?php if (!$isPublicView): ?>
     <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 transition-all duration-300">
@@ -149,6 +152,16 @@ if ($user_id && !$isPublicView) {
                     <a href="../FBregistration.php" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-800 transition shadow-sm flex items-center">
                         <i class="ri-store-3-line mr-1"></i> Register Business
                     </a>
+
+                    <button
+                        type="button"
+                        data-theme-toggle
+                        class="theme-toggle-btn inline-flex items-center justify-center h-10 w-10 rounded-full border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        aria-label="Toggle dark mode"
+                        title="Toggle dark mode"
+                    >
+                        <i data-theme-icon class="ri-moon-line text-lg"></i>
+                    </button>
                     
                     <div class="relative group">
                          <button class="flex items-center space-x-2 text-gray-600 hover:text-primary transition focus:outline-none">
@@ -184,6 +197,15 @@ if ($user_id && !$isPublicView) {
                 <a href="../fbusinessowner/categories.php" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Businesses</a>
                 <a href="favorites.php" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">My Favorites</a>
                 <a href="../FBregistration.php" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Register Business</a>
+                <button
+                    type="button"
+                    data-theme-toggle
+                    class="theme-toggle-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
+                    aria-label="Toggle dark mode"
+                    title="Toggle dark mode"
+                >
+                    <i data-theme-icon class="ri-moon-line mr-2"></i>Toggle Theme
+                </button>
                 <a href="#" onclick="openModal(); return false;" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Account Settings</a>
                 <a href="../logout.php" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50">Logout</a>
             </div>
@@ -192,30 +214,30 @@ if ($user_id && !$isPublicView) {
 <?php endif; ?>
 
 <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-60 items-center justify-center z-50">
-  <div id="accountModalContent" class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative m-4">
+    <div id="accountModalContent" class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6 relative m-4">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Account Settings</h2>
-        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="ri-close-line text-2xl"></i></button>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Account Settings</h2>
+                <button onclick="closeModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="ri-close-line text-2xl"></i></button>
     </div>
 
     <form id="accountForm" method="POST" action="update_account.php">
       <input type="hidden" name="user_id" value="<?php echo isset($_SESSION['user_id']) ? htmlspecialchars($_SESSION['user_id']) : ''; ?>">
       
       <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
           <input type="email" name="email" 
                  value="<?php echo isset($_SESSION['email']) ? htmlspecialchars($_SESSION['email']) : (isset($_SESSION['fb_email_address']) ? htmlspecialchars($_SESSION['fb_email_address']) : ''); ?>"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" required>
+               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" required>
       </div>
 
       <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
           <input type="password" name="password" placeholder="Leave blank to keep current"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
       </div>
 
       <div class="flex justify-end gap-3">
-        <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-lg text-gray-700 bg-gray-100 hover:bg-gray-200 font-medium transition">Cancel</button>
+                <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-lg text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition">Cancel</button>
         <button type="submit" class="px-5 py-2.5 rounded-lg text-white bg-red-600 hover:bg-red-700 font-medium transition shadow-sm">Save Changes</button>
       </div>
     </form>
@@ -305,11 +327,11 @@ if ($user_id && !$isPublicView) {
     </div>
 
     <div id="qrScannerModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-        <div class="bg-white p-4 rounded-xl relative max-w-sm w-full mx-4 shadow-2xl">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl relative max-w-sm w-full mx-4 shadow-2xl">
             <button onclick="closeQRScannerModal()" class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700"><i class="ri-close-line text-xl"></i></button>
-            <h3 class="text-center font-bold mb-2 text-lg">Scan QR Code</h3>
+            <h3 class="text-center font-bold mb-2 text-lg text-gray-900 dark:text-white">Scan QR Code</h3>
             <div id="qr-reader" class="rounded overflow-hidden"></div>
-            <p id="qrScanResult" class="mt-2 text-center font-semibold text-sm"></p>
+            <p id="qrScanResult" class="mt-2 text-center font-semibold text-sm text-gray-700 dark:text-gray-300"></p>
         </div>
     </div>
 
@@ -676,12 +698,12 @@ if ($user_id && !$isPublicView) {
 <?php endif; ?>
 
 <div id="aboutModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 transition-opacity">
-    <div class="bg-white rounded-2xl p-8 max-w-4xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-        <button onclick="document.getElementById('aboutModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors z-10">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-4xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+        <button onclick="document.getElementById('aboutModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors z-10">
             <i class="ri-close-line text-3xl"></i>
         </button>
         <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">About Us</h2>
-        <div class="text-sm sm:text-base text-gray-700 leading-relaxed space-y-4">
+        <div class="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed space-y-4">
           <p><strong>About the Business Permits and Licensing Office (BPLO)</strong><br>
           • The Business Permits and Licensing Office (BPLO) is the official arm of the Local Government Unit (LGU) responsible for overseeing the regulation, registration, and monitoring of all businesses operating within the municipality. Its primary mandate is to ensure that enterprises comply with national and local laws, ordinances, and standards to promote fair, safe, and legal business practices.</p>
           
@@ -740,14 +762,14 @@ if ($user_id && !$isPublicView) {
 </div>
 
 <div id="contactModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 transition-opacity">
-    <div class="bg-white rounded-2xl p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-        <button onclick="document.getElementById('contactModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+        <button onclick="document.getElementById('contactModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors">
             <i class="ri-close-line text-3xl"></i>
         </button>
         <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">Contact Us</h2>
-        <div class="space-y-6 text-gray-700">
+        <div class="space-y-6 text-gray-700 dark:text-gray-300">
             <p class="text-center text-base">We'd love to hear from you! Reach out to us through any of the following channels:</p>
-            <div class="bg-gray-50 p-6 rounded-xl space-y-4 border border-gray-100">
+            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl space-y-4 border border-gray-100 dark:border-gray-600">
                 <p class="flex items-center"><i class="ri-map-pin-line mr-3 text-primary text-xl"></i> <span><strong>Address:</strong> Municipal Hall, Libmanan, Camarines Sur, Philippines</span></p>
                 <p class="flex items-center"><i class="ri-phone-line mr-3 text-primary text-xl"></i> <span><strong>Phone:</strong> (054) 123-4567</span></p>
                 <p class="flex items-center"><i class="ri-mail-line mr-3 text-primary text-xl"></i> <span><strong>Email:</strong> tastelibmanan@gmail.com</span></p>
@@ -758,13 +780,13 @@ if ($user_id && !$isPublicView) {
 </div>
 
 <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4 transition-opacity">
-    <div class="bg-white rounded-2xl p-8 max-w-3xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
-        <button onclick="document.getElementById('privacyModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-3xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto">
+        <button onclick="document.getElementById('privacyModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors">
             <i class="ri-close-line text-3xl"></i>
         </button>
         <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-primary">Privacy Policy</h2>
-        <div class="text-sm sm:text-base text-gray-700 leading-relaxed space-y-4">
-          <p class="text-center text-gray-500 text-xs uppercase tracking-widest mb-4">Last Updated: October 2, 2025</p>
+        <div class="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed space-y-4">
+          <p class="text-center text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mb-4">Last Updated: October 2, 2025</p>
           <div class="space-y-2">
               <p><strong>1. Introduction</strong><br>• The BPLO System respects your privacy and is committed to protecting the personal information you provide. This  Privacy Policy explains how we collect, use, and safeguard your information.</p>
               <p><strong>2. Information We Collect</strong><br>•  Personal Information: Name, address, email, contact number, and business details (when applying for permits). <br>
@@ -822,43 +844,43 @@ if ($user_id && !$isPublicView) {
 </div>
 
 <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] hidden">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md m-4 transform transition-all">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md m-4 transform transition-all">
         <div class="flex justify-between items-center mb-4 border-b pb-2">
-            <h2 class="text-xl font-bold text-gray-800">Write a Review</h2>
-            <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600"><i class="ri-close-line text-2xl"></i></button>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white">Write a Review</h2>
+            <button onclick="closeReviewModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"><i class="ri-close-line text-2xl"></i></button>
         </div>
         
         <input type="hidden" id="user_id" value="<?php echo $user_id; ?>">
         <input type="hidden" id="reviewer_name" value="<?php echo isset($owner['name']) ? htmlspecialchars($owner['name']) : 'User'; ?>">
 
         <div class="mb-4 text-center">
-            <p class="text-sm text-gray-500 mb-2">How was your experience?</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">How was your experience?</p>
             <div id="starRating" class="flex justify-center gap-2"></div>
         </div>
 
-        <textarea id="comment" rows="4" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-sm mb-4" placeholder="Tell us what you liked or didn't like..."></textarea>
+        <textarea id="comment" rows="4" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-sm mb-4" placeholder="Tell us what you liked or didn't like..."></textarea>
 
         <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Photo</label>
-                <input type="file" id="photo" accept="image/*" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Photo</label>
+                <input type="file" id="photo" accept="image/*" class="text-xs text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Video</label>
-                <input type="file" id="video" accept="video/*" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Video</label>
+                <input type="file" id="video" accept="video/*" class="text-xs text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
             </div>
         </div>
 
         <div class="flex justify-end gap-3">
-            <button onclick="closeReviewModal()" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm font-medium">Cancel</button>
+            <button onclick="closeReviewModal()" class="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm font-medium">Cancel</button>
             <button onclick="submitReview()" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-medium shadow">Submit Review</button>
         </div>
     </div>
 </div>
 
 <div id="editReviewModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[60]">
-  <div class="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 m-4">
-    <h2 class="text-xl font-bold mb-4 text-gray-800">Edit Your Review</h2>
+  <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-xl shadow-2xl p-6 m-4">
+    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Edit Your Review</h2>
 
     <form id="editReviewForm" enctype="multipart/form-data">
       <input type="hidden" id="editReviewId" name="review_id">
@@ -880,19 +902,19 @@ if ($user_id && !$isPublicView) {
 
       <div class="flex gap-4 mb-4">
           <div class="w-1/2">
-              <label class="block text-xs font-bold text-gray-500 mb-1">New Photo</label>
+              <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">New Photo</label>
               <input type="file" id="editPhoto" name="photo" accept="image/*" class="text-xs w-full">
               <img id="editPhotoPreviewImg" class="mt-2 h-20 w-20 object-cover rounded hidden">
           </div>
           <div class="w-1/2">
-              <label class="block text-xs font-bold text-gray-500 mb-1">New Video</label>
+              <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">New Video</label>
               <input type="file" id="editVideo" name="video" accept="video/*" class="text-xs w-full">
               <video id="editVideoPreviewVideo" class="mt-2 h-20 w-20 object-cover rounded hidden" controls><source src=""></video>
           </div>
       </div>
 
       <div class="flex justify-end space-x-3">
-        <button type="button" id="closeEditBtn" class="px-4 py-2 bg-gray-100 rounded-lg text-gray-700 text-sm hover:bg-gray-200">Cancel</button>
+                <button type="button" id="closeEditBtn" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-200 text-sm hover:bg-gray-200 dark:hover:bg-gray-600">Cancel</button>
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 shadow">Update</button>
       </div>
     </form>
@@ -1558,50 +1580,122 @@ if ($user_id && !$isPublicView) {
         });
     }, 2000);
 
-    // --- Map Logic ---
+        // --- Map Logic ---
+
+let businessMap;
+let businessPolygon;
+let businessMapThemeBound = false;
+
+const BUSINESS_MAP_STYLES_LIGHT = [
+    { featureType: "all", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#334155" }] },
+    { featureType: "administrative", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#ffffff" }, { weight: 2 }] },
+    { featureType: "administrative.locality", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "administrative.neighborhood", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "administrative.land_parcel", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#475569" }] },
+    { featureType: "road", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#ffffff" }, { weight: 2 }] },
+    { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
+];
+
+const BUSINESS_MAP_STYLES_DARK = [
+    { featureType: "all", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { elementType: "geometry", stylers: [{ color: "#1f2937" }] },
+    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#374151" }] },
+    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#111827" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#334155" }] },
+    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#1f2937" }] },
+    { featureType: "transit", elementType: "geometry", stylers: [{ color: "#0f172a" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0b1220" }] },
+    { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#cbd5e1" }] },
+    { featureType: "administrative", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#111827" }, { weight: 2 }] },
+    { featureType: "administrative.locality", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "administrative.neighborhood", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "administrative.land_parcel", elementType: "labels", stylers: [{ visibility: "on" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#94a3b8" }] },
+    { featureType: "road", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#0f172a" }, { weight: 2 }] },
+    { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
+];
+
+function isBusinessMapDarkTheme() {
+    return document.documentElement.classList.contains('theme-dark') ||
+                 document.documentElement.getAttribute('data-theme') === 'dark';
+}
+
+function getBusinessMapStyles() {
+    return isBusinessMapDarkTheme() ? BUSINESS_MAP_STYLES_DARK : BUSINESS_MAP_STYLES_LIGHT;
+}
+
+function updateBusinessMapTheme() {
+    if (!businessMap) return;
+
+    businessMap.setOptions({ styles: getBusinessMapStyles() });
+
+    if (businessPolygon) {
+        businessPolygon.setOptions({
+            strokeColor: isBusinessMapDarkTheme() ? "#f87171" : "#A80000"
+        });
+    }
+}
+
+function bindBusinessMapThemeUpdates() {
+    if (businessMapThemeBound) return;
+    businessMapThemeBound = true;
+
+    const root = document.documentElement;
+    const observer = new MutationObserver(() => {
+        updateBusinessMapTheme();
+    });
+
+    observer.observe(root, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+
+    document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            setTimeout(updateBusinessMapTheme, 0);
+        });
+    });
+}
 
 function initBusinessMap() {
-  const lat = <?php echo json_encode($business['fb_latitude']); ?>;
-  const lng = <?php echo json_encode($business['fb_longitude']); ?>;
+    const lat = <?php echo json_encode($business['fb_latitude']); ?>;
+    const lng = <?php echo json_encode($business['fb_longitude']); ?>;
 
-  if (lat && lng && document.getElementById('businessMap')) {
-    const libmananCoords = [
-      { lat: 13.6070, lng: 123.0645 },
-      { lat: 13.6155, lng: 123.1050 },
-      { lat: 13.5923, lng: 123.1210 },
-      { lat: 13.5730, lng: 123.0870 },
-      { lat: 13.5890, lng: 123.0600 }
-    ];
+    if (lat && lng && document.getElementById('businessMap')) {
+        const libmananBoundsLiteral = {
+            north: 13.7688,
+            south: 13.5862,
+            east: 123.1190,
+            west: 122.7980
+        };
 
-    const map = new google.maps.Map(document.getElementById('businessMap'), {
-      center: { lat: parseFloat(lat), lng: parseFloat(lng) },
-      zoom: 15,
-      styles: [
-        {
-          featureType: "all",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }]
-        }
-      ]
-    });
+        const libmananCenter = { lat: 13.6775, lng: 122.9585 };
+        const markerPosition = { lat: parseFloat(lat), lng: parseFloat(lng) };
 
-    const libmananPolygon = new google.maps.Polygon({
-      paths: libmananCoords,
-      strokeColor: "#A80000",
-      strokeOpacity: 1,
-      strokeWeight: 2,
-      fillColor: "transparent",
-      fillOpacity: 0.7,
-      clickable: false
-    });
-    libmananPolygon.setMap(map);
+        const isInsideLibmanan =
+            markerPosition.lat <= libmananBoundsLiteral.north &&
+            markerPosition.lat >= libmananBoundsLiteral.south &&
+            markerPosition.lng <= libmananBoundsLiteral.east &&
+            markerPosition.lng >= libmananBoundsLiteral.west;
 
-    new google.maps.Marker({
-      position: { lat: parseFloat(lat), lng: parseFloat(lng) },
-      map: map,
-      title: "Business Location"
-    });
-  }
+        businessMap = new google.maps.Map(document.getElementById('businessMap'), {
+            center: isInsideLibmanan ? markerPosition : libmananCenter,
+            zoom: isInsideLibmanan ? 15 : 12,
+            restriction: { latLngBounds: libmananBoundsLiteral, strictBounds: true },
+            mapTypeId: 'roadmap',
+            streetViewControl: false,
+            styles: getBusinessMapStyles()
+        });
+
+        businessPolygon = null;
+
+        new google.maps.Marker({
+            position: markerPosition,
+            map: businessMap,
+            title: "Business Location"
+        });
+
+        bindBusinessMapThemeUpdates();
+    }
 }
     
     // --- QR Scanner ---
@@ -1676,5 +1770,7 @@ function initBusinessMap() {
 
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo htmlspecialchars($maps_api_key, ENT_QUOTES, 'UTF-8'); ?>&callback=initBusinessMap" async defer></script>
+
+  <script src='../vendors/js/theme-toggle.js'></script>
 </body>
 </html>

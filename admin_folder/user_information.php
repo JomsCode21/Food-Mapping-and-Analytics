@@ -38,7 +38,9 @@ require_once '../db_con.php';
         background: #9ca3af; 
       }
     </style>
-  </head>
+  
+    <link rel='stylesheet' href='../vendors/css/theme-toggle.css'/>
+</head>
   <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
     
     <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -46,11 +48,21 @@ require_once '../db_con.php';
         <h1 class="font-['Pacifico'] text-3xl text-black-600">
           Taste<span class="text-red-500">Libmanan</span>
         </h1>
-        <div class="relative">
-          <button id="profiling-btn" class="text-gray-600 hover:text-blue-600 transition p-2 rounded-full hover:bg-gray-100">
-            <i class="ri-admin-line text-2xl"></i>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            data-theme-toggle
+            class="theme-toggle-btn inline-flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode"
+          >
+            <i data-theme-icon class="ri-moon-line text-lg"></i>
           </button>
-          <div id="admin-menu" class="hidden absolute right-0 top-full mt-2 w-48 bg-white shadow-xl rounded-xl py-2 z-50 border border-gray-100 transform origin-top-right transition-all duration-200">
+          <div class="relative">
+            <button id="profiling-btn" class="text-gray-600 hover:text-blue-600 transition p-2 rounded-full hover:bg-gray-100">
+              <i class="ri-admin-line text-2xl"></i>
+            </button>
+            <div id="admin-menu" class="hidden absolute right-0 top-full mt-2 w-48 bg-white shadow-xl rounded-xl py-2 z-50 border border-gray-100 transform origin-top-right transition-all duration-200">
             <a href="admin_account.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600">
                 <i class="ri-user-settings-line mr-2"></i> Account
             </a>
@@ -58,6 +70,7 @@ require_once '../db_con.php';
             <a href="../index.php" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
                 <i class="ri-logout-box-line mr-2"></i> Logout
             </a>
+            </div>
           </div>
         </div>
       </div>
@@ -70,7 +83,7 @@ require_once '../db_con.php';
           <h2 class="text-lg font-bold mb-6 mt-6 text-blue-700 tracking-wide">Dashboard Menu</h2>
           <ul class="w-full">
             <li class="mb-2 w-full">
-              <a href="bplo.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3 hover:bg-blue-100">
+              <a href="bplo.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3 hover:bg-blue-100 dark:hover:bg-blue-900/30">
                 <span class="inline-block w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
                 <i class="ri-dashboard-line text-xl"></i>
                 <span class="ml-2">Dashboard</span>
@@ -78,22 +91,22 @@ require_once '../db_con.php';
             </li>
             
             <li class="relative group w-full">
-              <a href="javascript:void(0);" onclick="toggleDropdown()" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3 w-full justify-between hover:bg-green-100">
+              <a href="javascript:void(0);" onclick="toggleDropdown()" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3 w-full justify-between hover:bg-green-100 dark:hover:bg-green-900/30">
                 <div class="flex items-center">
                   <span class="inline-block w-2 h-8 bg-green-500 rounded-full mr-3"></span>
                   <i class="ri-file-text-line text-xl"></i>
                   <span class="ml-2">Requests</span>
                 </div>
-                <i class="ri-arrow-down-s-line text-gray-400 text-xl"></i>
+                <i class="ri-arrow-down-s-line text-gray-400 dark:text-gray-300 text-xl"></i>
               </a>
               <ul id="registration-dropdown" class="hidden pl-14 mt-1 space-y-1">
-                <li><a href="business_request.php?type=new" class="block px-4 py-3 text-base text-gray-500 hover:text-black-600 rounded-lg hover:bg-green-100"><i class="ri-file-text-line text-xl mr-4"></i>New</a></li>
-                <li><a href="business_request.php?type=renewal" class="block px-4 py-3 text-base text-gray-500 hover:text-black-600 rounded-lg hover:bg-green-100"><i class="ri-refresh-line text-xl mr-4"></i>Renewal</a></li>
+                <li><a href="business_request.php?type=new" class="block px-4 py-3 text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30"><i class="ri-file-text-line text-xl mr-4"></i>New</a></li>
+                <li><a href="business_request.php?type=renewal" class="block px-4 py-3 text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30"><i class="ri-refresh-line text-xl mr-4"></i>Renewal</a></li>
               </ul>
             </li>
 
             <li class="mb-2 w-full">
-              <a href="business_management.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3 hover:bg-yellow-100">
+              <a href="business_management.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3 hover:bg-yellow-100 dark:hover:bg-yellow-900/30">
                 <span class="inline-block w-2 h-8 bg-yellow-500 rounded-full mr-3"></span>
                 <i class="ri-store-2-line text-xl"></i>
                 <span class="ml-2">Business Management</span>
@@ -101,7 +114,7 @@ require_once '../db_con.php';
             </li>
 
             <li class="mb-2 w-full">
-              <a href="user_information.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3 bg-orange-100 font-bold">
+              <a href="user_information.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-orange-700 dark:text-orange-100 gap-3 bg-orange-100 dark:bg-orange-900/30 font-bold">
                 <span class="inline-block w-2 h-8 bg-orange-500 rounded-full mr-3"></span>
                 <i class="ri-user-line text-xl"></i>
                 <span class="ml-2">User Information</span>
@@ -109,7 +122,7 @@ require_once '../db_con.php';
             </li>
 
             <li class="mb-2 w-full">
-              <a href="notification.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3 hover:bg-red-100">
+              <a href="notification.php" class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3 hover:bg-red-100 dark:hover:bg-red-900/30">
                 <span class="inline-block w-2 h-8 bg-red-500 rounded-full mr-3"></span>
                 <i class="ri-notification-line text-xl"></i>
                 <span class="ml-2">Notifications</span>
@@ -120,8 +133,8 @@ require_once '../db_con.php';
             <li class="w-full">
                 <a href="chat_with_business_owner.php"
                     id="toggle-chat-btn" 
-                    class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 gap-3 relative
-                    <?php echo($current_page == 'chat_with_business_owner.php') ? 'bg-pink-100 font-bold' : 'hover:bg-pink-100'; ?>">
+                    class="flex items-center px-6 py-3 rounded-lg transition font-medium text-gray-700 dark:text-gray-200 gap-3 relative
+                    <?php echo($current_page == 'chat_with_business_owner.php') ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-100 font-bold' : 'hover:bg-pink-100 dark:hover:bg-pink-900/30'; ?>">
 
                     <span class="inline-block w-2 h-8 bg-pink-500 rounded-full mr-3"></span>
                     <i class="ri-chat-1-line text-xl"></i>
@@ -255,5 +268,7 @@ require_once '../db_con.php';
         // Run every 3 seconds
         setInterval(checkUnreadMessages, 3000);
     </script>
-  </body>
+  
+  <script src='../vendors/js/theme-toggle.js'></script>
+</body>
 </html>

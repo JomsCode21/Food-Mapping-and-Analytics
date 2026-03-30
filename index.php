@@ -53,7 +53,27 @@ if (file_exists('db_con.php')) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <link rel="stylesheet" href="vendors/css/style.css"/>
+    <link rel="stylesheet" href="vendors/css/theme-toggle.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      (function () {
+        var savedTheme = null;
+        try {
+          savedTheme = localStorage.getItem('tlm-theme');
+        } catch (e) {}
+
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+        if (theme === 'dark') {
+          document.documentElement.classList.add('theme-dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('theme-dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
 
     <style>
       :where([class^="ri-"])::before { content: "\f3c2"; }
@@ -166,17 +186,27 @@ if (file_exists('db_con.php')) {
   <body class="bg-gray-50 text-gray-800 flex-col min-h-screen">
     
     <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md text-gray-800 shadow-sm z-40 transition-all duration-300">
-      <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+      <div class="max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-4 py-3">
         <div class="flex items-center group cursor-pointer">
-          <h1 class="font-pacific text-2xl text-primary transform transition-transform group-hover:scale-105">
+          <h1 class="font-pacific text-xl sm:text-2xl text-primary transform transition-transform group-hover:scale-105">
             Taste<span class="text-gray-800">Libmanan</span>
           </h1>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 sm:gap-3 md:gap-4">
+          <button
+            type="button"
+            data-theme-toggle
+            class="theme-toggle-btn inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode"
+          >
+            <i data-theme-icon class="ri-moon-line text-base sm:text-lg"></i>
+          </button>
+
           <button
             id="login-btn"
-            class="inline-flex items-center justify-center h-10 px-4 md:px-6 border-2 border-primary bg-transparent text-primary rounded-full text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-md active:scale-95 whitespace-nowrap"
+            class="inline-flex items-center justify-center h-9 sm:h-10 px-3 sm:px-4 md:px-6 border-2 border-primary bg-transparent text-primary rounded-full text-[11px] sm:text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-md active:scale-95 whitespace-nowrap"
             type="button"
           >
             Login
@@ -184,10 +214,11 @@ if (file_exists('db_con.php')) {
 
           <button
             id="register-btn"
-            class="inline-flex items-center justify-center h-10 px-4 md:px-6 border-2 border-primary bg-primary text-white rounded-full text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-primaryHover hover:border-primaryHover hover:shadow-md active:scale-95 shadow-red-200 whitespace-nowrap"
+            class="inline-flex items-center justify-center h-9 sm:h-10 px-3 sm:px-4 md:px-6 border-2 border-primary bg-primary text-white rounded-full text-[11px] sm:text-xs md:text-sm font-semibold transition-all duration-300 hover:bg-primaryHover hover:border-primaryHover hover:shadow-md active:scale-95 shadow-red-200 whitespace-nowrap"
             type="button"
           >
-            Create Account
+            <span class="sm:hidden">Create</span>
+            <span class="hidden sm:inline">Create Account</span>
           </button>
         </div>
       </div>
@@ -904,6 +935,7 @@ if (file_exists('db_con.php')) {
     </div>
   </div>
 
+  <script src="vendors/js/theme-toggle.js"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init({

@@ -598,6 +598,8 @@ if (!$user_id) {
             }
         }
     </style>
+
+    <link rel='stylesheet' href='vendors/css/theme-toggle.css'/>
 </head>
 <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
 
@@ -1886,5 +1888,7 @@ if (!$user_id) {
         });
     </script>
     <?php endif; ?>
+
+  <script src='vendors/js/theme-toggle.js'></script>
 </body>
 </html>

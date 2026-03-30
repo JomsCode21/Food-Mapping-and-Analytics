@@ -32,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <title>Reply to Application</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel='stylesheet' href='vendors/css/theme-toggle.css'/>
 </head>
 <body class="bg-gradient-to-r from-blue-50 to-blue-100 flex items-center justify-center min-h-screen">
 
@@ -64,5 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
   </div>
 
+
+  <script src='vendors/js/theme-toggle.js'></script>
 </body>
 </html>

@@ -10,6 +10,7 @@ db_con.php
 .history/
 .DS_Store
 Thumbs.db
+*.log
 
 # Ignore raw database files
 *.frm

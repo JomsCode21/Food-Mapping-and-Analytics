@@ -134,7 +134,14 @@ require_once '../db_con.php';
 
     <style>
         body { font-family: 'Inter', sans-serif; }
+            html.theme-dark .group:hover .visit-page-btn {
+                background-color: #b91c1c !important;
+                color: #ffffff !important;
+                border-color: #b91c1c !important;
+            }
     </style>
+
+    <link rel='stylesheet' href='../vendors/css/theme-toggle.css'/>
 </head>
 
 <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
@@ -153,6 +160,16 @@ require_once '../db_con.php';
                     <a href="../FBregistration.php" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-800 transition shadow-sm flex items-center">
                         <i class="ri-store-3-line mr-1"></i> Register Business
                     </a>
+
+                    <button
+                        type="button"
+                        data-theme-toggle
+                        class="theme-toggle-btn inline-flex items-center justify-center h-10 w-10 rounded-full border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        aria-label="Toggle dark mode"
+                        title="Toggle dark mode"
+                    >
+                        <i data-theme-icon class="ri-moon-line text-lg"></i>
+                    </button>
                     
                     <div class="relative group">
                          <button class="flex items-center space-x-2 text-gray-600 hover:text-primary transition focus:outline-none">
@@ -178,6 +195,15 @@ require_once '../db_con.php';
                 <a href="categories.php" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary">Businesses</a>
                 <a href="../users/favorites.php" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary">My Favorites</a>
                 <a href="../FBregistration.php" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Register Business</a>
+                <button
+                    type="button"
+                    data-theme-toggle
+                    class="theme-toggle-btn block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
+                    aria-label="Toggle dark mode"
+                    title="Toggle dark mode"
+                >
+                    <i data-theme-icon class="ri-moon-line mr-2"></i>Toggle Theme
+                </button>
                 <a href="#" onclick="openModal('accountModal')" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary">Account Settings</a>
                 <a href="../logout.php" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50">Logout</a>
             </div>
@@ -307,7 +333,7 @@ require_once '../db_con.php';
                                 <?php endif; ?>
                             </p>
                                 
-                            <div class="block w-full text-center py-2.5 rounded-xl bg-gray-50 text-gray-700 font-semibold text-sm group-hover:bg-primary group-hover:text-white transition-colors border border-gray-100">
+                            <div class="visit-page-btn mt-auto block w-full text-center py-2.5 rounded-xl bg-gray-50 text-gray-700 font-semibold text-sm group-hover:bg-primary group-hover:text-white transition-colors border border-gray-100">
                                 View Details
                             </div>
                         </div>
@@ -529,5 +555,7 @@ require_once '../db_con.php';
             });
         }
     </script>
+
+  <script src='../vendors/js/theme-toggle.js'></script>
 </body>
 </html>

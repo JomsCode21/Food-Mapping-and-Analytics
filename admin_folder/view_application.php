@@ -57,6 +57,8 @@ function getStatusColor($status) {
     <title>Application #<?php echo $ba_id; ?> Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel='stylesheet' href='../vendors/css/theme-toggle.css'/>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
@@ -212,5 +214,7 @@ function getStatusColor($status) {
             if (e.target === this) closeModal();
         };
     </script>
+
+  <script src='../vendors/js/theme-toggle.js'></script>
 </body>
 </html>
