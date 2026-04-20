@@ -1,0 +1,3 @@
+@echo off
+echo Starting PHP built-in server on localhost:8080...
+php -S localhost:8080
