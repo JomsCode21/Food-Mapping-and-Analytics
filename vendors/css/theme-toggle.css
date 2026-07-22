@@ -15,6 +15,7 @@ body {
   right: 16px;
   bottom: 16px;
   z-index: 9999;
+  box-sizing: border-box;
   width: 42px;
   height: 42px;
   border: 1px solid #d1d5db;
@@ -30,7 +31,7 @@ body {
   background: #e5e7eb;
 }
 
-.theme-toggle-floating [data-theme-glyph] {
+.theme-toggle-floating .theme-toggle-glyph {
   font-size: 18px;
   line-height: 1;
 }
@@ -122,6 +123,28 @@ html.theme-dark #mobile-menu,
 html.theme-dark #admin-menu {
   background-color: #111827 !important;
   color: #e5e7eb !important;
+}
+
+html.theme-dark .admin-sidebar-menu a.font-bold {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.theme-dark .admin-sidebar-menu a.font-bold i,
+html.theme-dark .admin-sidebar-menu a.font-bold span {
+  color: inherit !important;
+}
+
+html.theme-dark .admin-sidebar-menu > li > a:hover,
+html.theme-dark .admin-sidebar-menu > li > .group > a:hover,
+html.theme-dark .admin-sidebar-menu ul li a:hover {
+  background-color: #1f2937 !important;
+  color: #f8fafc !important;
+}
+
+html.theme-dark .admin-sidebar-menu ul li a:hover i,
+html.theme-dark .admin-sidebar-menu ul li a:hover span {
+  color: inherit !important;
 }
 
 html.theme-dark .hero-section {
